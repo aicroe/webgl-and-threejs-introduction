@@ -13,6 +13,13 @@ import { Display } from 'app/display';
       display: block;
       height: 100%;
       width: 100%;
+      background: rgb(241, 241, 241);
+      background: radial-gradient(
+        circle,
+        rgba(241, 241, 241, 1) 5%,
+        rgba(205, 205, 205, 1) 45%,
+        rgba(161, 161, 161, 1) 100%
+      );
     }
   `],
 })
