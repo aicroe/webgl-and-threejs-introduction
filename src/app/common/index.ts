@@ -1,1 +1,2 @@
-export * from './set-position';
+export * from './position';
+export * from './world-vectors';
