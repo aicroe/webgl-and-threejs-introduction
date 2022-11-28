@@ -34,6 +34,7 @@ export class DisplayContainerComponent implements OnInit {
       this.display = new Display(container);
       this.display.setUpOrbitControls();
       this.display.bootstrapScene();
+      this.display.addHelpers();
       this.display.animate();
     });
   }
