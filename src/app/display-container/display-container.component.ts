@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, NgZone, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Display } from 'app/display';
@@ -26,23 +26,19 @@ import { Display } from 'app/display';
 export class DisplayContainerComponent implements OnInit {
   private display!: Display;
 
-  constructor(private ngZone: NgZone, private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef) { }
 
   ngOnInit(): void {
     const container: HTMLElement = this.elementRef.nativeElement;
-    this.ngZone.runOutsideAngular(() => {
-      this.display = new Display(container);
-      this.display.setUpOrbitControls();
-      this.display.bootstrapScene();
-      this.display.addHelpers();
-      this.display.animate();
-    });
+    this.display = new Display(container);
+    this.display.setUpOrbitControls();
+    this.display.bootstrapScene();
+    this.display.addHelpers();
+    this.display.animate();
   }
 
   @HostListener('window:resize')
   resize(): void {
-    this.ngZone.runOutsideAngular(() => {
-      this.display.resize();
-    });
+    this.display.resize();
   }
 }
