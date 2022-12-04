@@ -1,0 +1,35 @@
+<div #viewport class="viewport"></div>
+
+<mat-toolbar class="toolbar">
+
+  <div class="toolbar__center">
+    <button
+      mat-icon-button
+      aria-label="Focus Previous"
+      title="Previous"
+      (click)="focusPrevious()"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      aria-label="Focus Next"
+      title="Next"
+      (click)="focusNext()"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
+  <div class="toolbar__filler"></div>
+
+  <button
+    mat-icon-button
+    aria-label="Settings"
+    title="Settings"
+  >
+    <mat-icon>settings</mat-icon>
+  </button>
+
+</mat-toolbar>

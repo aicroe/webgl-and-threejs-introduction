@@ -50,7 +50,6 @@ export class FocusControl {
 
     if (this.hasCameraReachedPoint(this.camera, current)) {
       this.updating = false;
-      setTimeout(() => this.next(), 1_000);
     }
   }
 

@@ -1,0 +1,35 @@
+$viewport-inner-color: rgba(241, 241, 241, 1);
+$viewport-transit-color: rgba(205, 205, 205, 1);
+$viewport-outer-color: rgba(161, 161, 161, 1);
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.viewport {
+  flex: 1 1 auto;
+  background: radial-gradient(
+    circle,
+    $viewport-inner-color 5%,
+    $viewport-transit-color 45%,
+    $viewport-outer-color 100%
+  );
+}
+
+.toolbar {
+  flex-basis: 64px;
+  position: relative;
+}
+
+.toolbar__filler {
+  flex-grow: 1;
+}
+
+.toolbar__center {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}

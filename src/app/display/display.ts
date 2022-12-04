@@ -48,10 +48,6 @@ export class Display {
       control: focusControl,
     } = createGraphicsPipelineScene(this.camera);
 
-    setTimeout(() => {
-      focusControl.next();
-    }, 2_000);
-
     setPosition(graphicsPipelineScene, { z: -5 });
     this.scene.add(graphicsPipelineScene);
     this.focusControl = focusControl;
@@ -75,20 +71,26 @@ export class Display {
     this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement)
   }
 
+  focusNext(): void {
+    this.focusControl?.next();
+  }
+
+  focusPrevious(): void {
+    this.focusControl?.previous();
+  }
+
   resize(): void {
     this.camera.aspect = this.getAspectRatio();
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
   }
 
-  animate = (time: number = 0) => {
-    requestAnimationFrame(this.animate);
-    this.render(time);
+  update(): void {
+    this.focusControl?.update();
   }
 
-  private render(time: number): void {
+  render(time: number): void {
     this.renderer.render(this.scene, this.camera);
-    this.focusControl?.update();
   }
 
   private getAspectRatio(): number {
