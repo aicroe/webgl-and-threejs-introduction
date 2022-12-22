@@ -1,4 +1,11 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import {
+  ApplicationRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,9 +29,14 @@ import { Display } from 'app/display';
 export class DisplayContainerComponent implements OnInit {
   @ViewChild('viewport', { static: true }) viewport!: ElementRef;
 
+  isFullScreen = false;
+
   private display!: Display;
 
-  constructor() { }
+  constructor(
+    private elementRef: ElementRef,
+    private appRef: ApplicationRef,
+  ) { }
 
   ngOnInit(): void {
     const viewportElement: HTMLElement = this.viewport.nativeElement;
@@ -46,6 +58,22 @@ export class DisplayContainerComponent implements OnInit {
 
   focusPrevious(): void {
     this.display.focusPrevious();
+  }
+
+  enterFullScreen(): void {
+    if (document.fullscreenEnabled && !document.fullscreenElement) {
+      this.elementRef.nativeElement.requestFullscreen();
+      this.isFullScreen = true;
+      this.appRef.tick();
+    }
+  }
+
+  exitFullScreen(): void {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+      this.isFullScreen = false;
+      this.appRef.tick();
+    }
   }
 
   private animate(): void {

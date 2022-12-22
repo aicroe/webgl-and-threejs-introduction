@@ -32,4 +32,24 @@
     <mat-icon>settings</mat-icon>
   </button>
 
+  <button
+    *ngIf="!isFullScreen"
+    mat-icon-button
+    aria-label="Enter Fullscreen"
+    title="Enter Fullscreen"
+    (click)="enterFullScreen()"
+  >
+    <mat-icon>fullscreen</mat-icon>
+  </button>
+
+  <button
+    *ngIf="isFullScreen"
+    mat-icon-button
+    aria-label="Exit Fullscreen"
+    title="Exit Fullscreen"
+    (click)="exitFullScreen()"
+  >
+    <mat-icon>fullscreen_exit</mat-icon>
+  </button>
+
 </mat-toolbar>
