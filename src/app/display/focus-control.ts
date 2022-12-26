@@ -3,13 +3,14 @@ import { FocusPoint } from './focus-point';
 
 export class FocusControl {
   private points: FocusPoint[] = [];
-  private activePoint: number | undefined;
+  private active: number | undefined;
   private updating = false;
 
-  private static readonly UPDATE_FACTOR = 0.025;
-  private static readonly DISTANCE_TOLERANCE = 0.001;
-
-  constructor(private camera: Camera) {}
+  constructor(
+    private camera: Camera,
+    private readonly updateFactor = 0.025,
+    private readonly distanceTolerance = 0.001,
+  ) {}
 
   addPoint(point: FocusPoint): void {
     this.points.push(point);
@@ -20,7 +21,7 @@ export class FocusControl {
       return;
     }
 
-    const nextPoint = this.activePoint === undefined ? 0 : this.activePoint + 1;
+    const nextPoint = this.active === undefined ? 0 : this.active + 1;
     this.changeFocusedPoint(nextPoint);
   }
 
@@ -29,23 +30,25 @@ export class FocusControl {
       return;
     }
 
-    const previousPoint = this.activePoint === undefined ? 0 : this.activePoint - 1;
+    const previousPoint = this.active === undefined ?
+      -1 :
+      this.active - 1;
     this.changeFocusedPoint(previousPoint);
   }
 
   update(): void {
-    if (!this.updating || this.activePoint === undefined) {
+    if (!this.updating || this.active === undefined) {
       return;
     }
 
-    const current = this.points[this.activePoint];
+    const current = this.points[this.active];
     this.camera.position.lerp(
       current.getObserverWorldPosition(),
-      FocusControl.UPDATE_FACTOR,
+      this.updateFactor,
     );
     this.camera.quaternion.slerp(
       current.getObserverWorldQuaternion(),
-      FocusControl.UPDATE_FACTOR,
+      this.updateFactor,
     );
 
     if (this.hasCameraReachedPoint(this.camera, current)) {
@@ -53,20 +56,20 @@ export class FocusControl {
     }
   }
 
-  private changeFocusedPoint(activePoint: number): void {
-    if (activePoint < 0 || activePoint >= this.points.length) {
+  private changeFocusedPoint(pointIndex: number): void {
+    if (pointIndex < 0 || pointIndex >= this.points.length) {
       return;
     }
 
-    const current = this.points[activePoint];
+    const current = this.points[pointIndex];
     current.configureObserverQuaternion();
 
-    this.activePoint = activePoint;
+    this.active = pointIndex;
     this.updating = true;
   }
 
   private hasCameraReachedPoint(camera: Camera, current: FocusPoint): boolean {
     const distance = camera.position.distanceToSquared(current.getObserverWorldPosition());
-    return distance <= FocusControl.DISTANCE_TOLERANCE;
+    return distance <= this.distanceTolerance;
   }
 }

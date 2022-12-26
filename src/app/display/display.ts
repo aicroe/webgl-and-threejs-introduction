@@ -6,11 +6,11 @@ import {
   HemisphereLight,
   PerspectiveCamera,
   Scene,
+  sRGBEncoding,
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { setPosition } from 'app/common';
-import { createGraphicsPipelineScene } from './create-graphics-pipeline-scene';
+import { DisplayClassroom } from './display-classroom';
 import { FocusControl } from './focus-control';
 
 export class Display {
@@ -20,6 +20,7 @@ export class Display {
   private directionalLight?: DirectionalLight;
   private orbitControls?: OrbitControls;
   private focusControl?: FocusControl;
+  private classroom?: DisplayClassroom;
 
   constructor(private container: HTMLElement) {
     const fov = 75;
@@ -27,6 +28,7 @@ export class Display {
     const far = 1000;
     this.camera = new PerspectiveCamera(fov, this.getAspectRatio(), near, far);
     this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
+    this.renderer.outputEncoding = sRGBEncoding;
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     this.scene = new Scene();
 
@@ -39,18 +41,9 @@ export class Display {
     const ambientLight = new HemisphereLight(0xffffbb, 0x080820, 0.5);
     this.scene.add(ambientLight);
 
-    this.directionalLight = new DirectionalLight(0xffffff, 0.7);
-    this.directionalLight.position.set(-1, 2, 4);
-    this.scene.add(this.directionalLight);
+    this.classroom = new DisplayClassroom();
 
-    const {
-      scene: graphicsPipelineScene,
-      control: focusControl,
-    } = createGraphicsPipelineScene(this.camera);
-
-    setPosition(graphicsPipelineScene, { z: -5 });
-    this.scene.add(graphicsPipelineScene);
-    this.focusControl = focusControl;
+    this.scene.add(this.classroom);
   }
 
   addHelpers(): void {
@@ -65,28 +58,36 @@ export class Display {
       );
       this.scene.add(directionalLightHelper);
     }
+
+    (globalThis as any).display = this;
   }
 
   setUpOrbitControls(): void {
-    this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement)
+    this.orbitControls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement,
+    );
   }
 
-  focusNext(): void {
-    this.focusControl?.next();
+  next(): void {
+    this.classroom?.next();
   }
 
-  focusPrevious(): void {
-    this.focusControl?.previous();
+  previous(): void {
+    this.classroom?.previous();
   }
 
   resize(): void {
     this.camera.aspect = this.getAspectRatio();
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+    this.renderer.setSize(
+      this.container.clientWidth,
+      this.container.clientHeight,
+    );
   }
 
   update(): void {
-    this.focusControl?.update();
+    this.classroom?.update();
   }
 
   render(time: number): void {

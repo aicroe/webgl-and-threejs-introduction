@@ -52,12 +52,12 @@ export class DisplayContainerComponent implements OnInit {
     this.display.resize();
   }
 
-  focusNext(): void {
-    this.display.focusNext();
+  next(): void {
+    this.display.next();
   }
 
-  focusPrevious(): void {
-    this.display.focusPrevious();
+  previous(): void {
+    this.display.previous();
   }
 
   enterFullScreen(): void {
