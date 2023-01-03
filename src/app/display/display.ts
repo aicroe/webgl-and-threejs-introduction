@@ -1,4 +1,3 @@
-
 import {
   CameraHelper,
   DirectionalLight,
@@ -10,6 +9,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { createTitle } from './create-title';
 import { DisplayClassroom } from './display-classroom';
 import { FocusControl } from './focus-control';
 
@@ -27,9 +27,11 @@ export class Display {
     const near = 0.1;
     const far = 1000;
     this.camera = new PerspectiveCamera(fov, this.getAspectRatio(), near, far);
+
     this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.outputEncoding = sRGBEncoding;
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+
     this.scene = new Scene();
 
     this.container.appendChild(this.renderer.domElement);
@@ -41,9 +43,18 @@ export class Display {
     const ambientLight = new HemisphereLight(0xffffbb, 0x080820, 0.5);
     this.scene.add(ambientLight);
 
+    this.directionalLight = new DirectionalLight(0xffffff, 0.8);
+    this.directionalLight.position.set(1, 1, 5);
+    this.scene.add(this.directionalLight)
+
     this.classroom = new DisplayClassroom();
+    this.classroom.position.set(0, -100, -70);
+
+    const title = createTitle('WebGL and THREE.js \n       Introduction');
+    title.position.set(-25, 0, -15);
 
     this.scene.add(this.classroom);
+    this.scene.add(title);
   }
 
   addHelpers(): void {

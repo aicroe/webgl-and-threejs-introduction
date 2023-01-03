@@ -16,8 +16,12 @@ export function createClassroom(): Object3D {
         { y: 12, x: 15 },
       );
 
-      object.rotateY(Math.PI / 2);
-      object.add(classroom.scene);
+      const scene = setPosition(
+        classroom.scene.rotateY(Math.PI / 2),
+        { y: 1.3 },
+      );
+
+      object.add(scene);
       object.add(light);
     });
 
