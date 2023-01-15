@@ -3,6 +3,7 @@ import {
   DirectionalLight,
   DirectionalLightHelper,
   HemisphereLight,
+  Object3D,
   PerspectiveCamera,
   Scene,
   sRGBEncoding,
@@ -12,6 +13,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createTitle } from './create-title';
 import { DisplayClassroom } from './display-classroom';
 import { FocusControl } from './focus-control';
+import { FocusPoint } from './focus-point';
 
 export class Display {
   private renderer: WebGLRenderer;
@@ -20,7 +22,6 @@ export class Display {
   private directionalLight?: DirectionalLight;
   private orbitControls?: OrbitControls;
   private focusControl?: FocusControl;
-  private classroom?: DisplayClassroom;
 
   constructor(private container: HTMLElement) {
     const fov = 75;
@@ -44,17 +45,29 @@ export class Display {
     this.scene.add(ambientLight);
 
     this.directionalLight = new DirectionalLight(0xffffff, 0.8);
-    this.directionalLight.position.set(1, 1, 5);
+    this.directionalLight.position.set(-1, 1, 2);
     this.scene.add(this.directionalLight)
 
-    this.classroom = new DisplayClassroom();
-    this.classroom.position.set(0, -100, -70);
+    const classroom = new FocusPoint(
+      new DisplayClassroom(),
+      new Object3D().translateZ(35).translateY(-3),
+    );
+    classroom.rotateY(-Math.PI  / 2);
+    classroom.position.set(200, 0, 0);
 
-    const title = createTitle('WebGL and THREE.js \n       Introduction');
-    title.position.set(-25, 0, -15);
+    const title = new FocusPoint(
+      createTitle('WebGL and THREE.js \n       Introduction'),
+      new Object3D().translateZ(20),
+    );
+    title.position.set(0, 0, -15);
 
-    this.scene.add(this.classroom);
+    title.setNextPoint(classroom);
+
+    this.focusControl = new FocusControl(this.camera);
+    this.focusControl.setCurrentFocusPoint(title);
+
     this.scene.add(title);
+    this.scene.add(classroom);
   }
 
   addHelpers(): void {
@@ -81,11 +94,11 @@ export class Display {
   }
 
   next(): void {
-    this.classroom?.next();
+    this.focusControl?.next();
   }
 
   previous(): void {
-    this.classroom?.previous();
+    this.focusControl?.previous();
   }
 
   resize(): void {
@@ -98,7 +111,7 @@ export class Display {
   }
 
   update(): void {
-    this.classroom?.update();
+    this.focusControl?.update();
   }
 
   render(time: number): void {

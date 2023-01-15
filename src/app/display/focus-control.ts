@@ -2,8 +2,7 @@ import { Camera } from 'three';
 import { FocusPoint } from './focus-point';
 
 export class FocusControl {
-  private points: FocusPoint[] = [];
-  private active: number | undefined;
+  private current: FocusPoint | null = null;
   private updating = false;
 
   constructor(
@@ -12,59 +11,51 @@ export class FocusControl {
     private readonly distanceTolerance = 0.001,
   ) {}
 
-  addPoint(point: FocusPoint): void {
-    this.points.push(point);
+  setCurrentFocusPoint(point: FocusPoint): void {
+    this.current = point;
   }
 
   next(): void {
-    if (this.points.length === 0) {
+    const nextPoint = this.current?.getNextPoint();
+    if (!nextPoint) {
       return;
     }
 
-    const nextPoint = this.active === undefined ? 0 : this.active + 1;
     this.changeFocusedPoint(nextPoint);
   }
 
   previous(): void {
-    if (this.points.length === 0) {
+    const previousPoint = this.current?.getPreviousPoint();
+    if (!previousPoint) {
       return;
     }
 
-    const previousPoint = this.active === undefined ?
-      -1 :
-      this.active - 1;
     this.changeFocusedPoint(previousPoint);
   }
 
   update(): void {
-    if (!this.updating || this.active === undefined) {
+    if (!this.updating || !this.current) {
       return;
     }
 
-    const current = this.points[this.active];
     this.camera.position.lerp(
-      current.getObserverWorldPosition(),
+      this.current.getObserverWorldPosition(),
       this.updateFactor,
     );
     this.camera.quaternion.slerp(
-      current.getObserverWorldQuaternion(),
+      this.current.getObserverWorldQuaternion(),
       this.updateFactor,
     );
 
-    if (this.hasCameraReachedPoint(this.camera, current)) {
+    if (this.hasCameraReachedPoint(this.camera, this.current)) {
       this.updating = false;
     }
   }
 
-  private changeFocusedPoint(pointIndex: number): void {
-    if (pointIndex < 0 || pointIndex >= this.points.length) {
-      return;
-    }
+  private changeFocusedPoint(point: FocusPoint): void {
+    point.configureObserverQuaternion();
 
-    const current = this.points[pointIndex];
-    current.configureObserverQuaternion();
-
-    this.active = pointIndex;
+    this.current = point;
     this.updating = true;
   }
 

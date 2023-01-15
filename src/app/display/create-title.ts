@@ -6,9 +6,9 @@ export function createTitle(text: string): Object3D {
   const object = new Object3D();
 
   import('three/examples/fonts/droid/droid_sans_regular.typeface.json').then(
-    (font) => {
+    (fontData) => {
       const titleGeometry = new TextGeometry(text, {
-        font: new Font(font),
+        font: new Font(fontData),
         size: 4,
         height: 0.2,
         curveSegments: 12,
@@ -22,6 +22,9 @@ export function createTitle(text: string): Object3D {
         shininess: 15,
       });
       const title = new Mesh(titleGeometry, titleMaterial);
+
+      title.geometry.computeBoundingBox();
+      title.geometry.boundingBox?.getCenter(title.position).multiplyScalar(-1);
 
       object.add(title);
     },
