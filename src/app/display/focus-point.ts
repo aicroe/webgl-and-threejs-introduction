@@ -4,36 +4,31 @@ import {
   getWorldQuaternionFactory,
 } from 'app/common';
 
-export class FocusPoint extends Object3D {
-  private nextPoint: FocusPoint | null = null;
-  private previousPoint: FocusPoint | null = null;
+export class FocusPoint {
+  private next: FocusPoint | null = null;
+  private previous: FocusPoint | null = null;
 
   constructor(
     private target: Object3D,
     private observer: Object3D,
-  ) {
-    super();
+  ) {}
 
-    this.add(target);
-    this.add(observer);
+  getNext(): FocusPoint | null {
+    return this.next;
   }
 
-  getNextPoint(): FocusPoint | null {
-    return this.nextPoint;
+  getPrevious(): FocusPoint | null {
+    return this.previous;
   }
 
-  getPreviousPoint(): FocusPoint | null {
-    return this.previousPoint;
+  setNext(next: FocusPoint): void {
+    this.next = next;
+    this.next.previous = this;
   }
 
-  setNextPoint(nextPoint: FocusPoint): void {
-    this.nextPoint = nextPoint;
-    this.nextPoint.previousPoint = this;
-  }
-
-  setPreviousPoint(previousPoint: FocusPoint): void {
-    this.previousPoint = previousPoint;
-    this.previousPoint.nextPoint = this;
+  setPrevious(previous: FocusPoint): void {
+    this.previous = previous;
+    this.previous.next = this;
   }
 
   getTarget(): Object3D {

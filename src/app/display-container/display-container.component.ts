@@ -78,8 +78,8 @@ export class DisplayContainerComponent implements OnInit {
 
   private animate(): void {
     animationFrames().pipe(
-      tap(() => {
-        this.display.update();
+      tap(({ timestamp }) => {
+        this.display.update(timestamp);
       }),
       throttleTime(20),
     ).subscribe({

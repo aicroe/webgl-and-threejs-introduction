@@ -1,22 +1,19 @@
 import { Camera } from 'three';
+import { Updatable } from 'app/common';
 import { FocusPoint } from './focus-point';
 
-export class FocusControl {
-  private current: FocusPoint | null = null;
+export class FocusControl implements Updatable {
   private updating = false;
 
   constructor(
     private camera: Camera,
+    private activePoint: FocusPoint,
     private readonly updateFactor = 0.025,
     private readonly distanceTolerance = 0.001,
   ) {}
 
-  setCurrentFocusPoint(point: FocusPoint): void {
-    this.current = point;
-  }
-
   next(): void {
-    const nextPoint = this.current?.getNextPoint();
+    const nextPoint = this.activePoint.getNext();
     if (!nextPoint) {
       return;
     }
@@ -25,7 +22,7 @@ export class FocusControl {
   }
 
   previous(): void {
-    const previousPoint = this.current?.getPreviousPoint();
+    const previousPoint = this.activePoint.getPrevious();
     if (!previousPoint) {
       return;
     }
@@ -34,20 +31,20 @@ export class FocusControl {
   }
 
   update(): void {
-    if (!this.updating || !this.current) {
+    if (!this.updating || !this.activePoint) {
       return;
     }
 
     this.camera.position.lerp(
-      this.current.getObserverWorldPosition(),
+      this.activePoint.getObserverWorldPosition(),
       this.updateFactor,
     );
     this.camera.quaternion.slerp(
-      this.current.getObserverWorldQuaternion(),
+      this.activePoint.getObserverWorldQuaternion(),
       this.updateFactor,
     );
 
-    if (this.hasCameraReachedPoint(this.camera, this.current)) {
+    if (this.hasCameraReachedPoint(this.camera, this.activePoint)) {
       this.updating = false;
     }
   }
@@ -55,7 +52,7 @@ export class FocusControl {
   private changeFocusedPoint(point: FocusPoint): void {
     point.configureObserverQuaternion();
 
-    this.current = point;
+    this.activePoint = point;
     this.updating = true;
   }
 
