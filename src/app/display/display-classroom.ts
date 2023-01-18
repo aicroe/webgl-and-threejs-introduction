@@ -1,5 +1,5 @@
 import { Group, Object3D } from 'three';
-import { setPosition, Updatable } from 'app/common';
+import { Updatable } from 'app/common';
 import { createClassroom } from './create-classroom';
 import { createPicture } from './create-picture';
 import { createWall } from './create-wall';
@@ -11,32 +11,29 @@ import { QuickSliderNode } from './quick-slider-node';
 function createClassroomSurroundings(): Object3D {
   const group = new Group();
 
-  const rearWall = setPosition(
-    createWall(140, 16.5),
-    { z: -50, y: 8.25 },
-  );
+  const rearWall = createWall(140, 16.5)
+    .translateY(8.25)
+    .translateZ(-50);
 
-  const leftWall = setPosition(
-    createWall(100, 16.5),
-    { x: -70, y: 8.25 },
-  );
-  leftWall.rotateY(Math.PI / 2);
+  const leftWall = createWall(100, 16.5)
+    .translateX(-70)
+    .translateY(8.25)
+    .rotateY(Math.PI / 2);
 
-  const rightWall = setPosition(
-    createWall(100, 16.5),
-    { x: 70, y: 8.25 },
-  );
-  rightWall.rotateY(Math.PI / 2);
+  const rightWall = createWall(100, 16.5)
+    .translateX(70)
+    .translateY(8.25)
+    .rotateY(Math.PI / 2);
 
-  const frontLeftWall = setPosition(
-    createWall(50, 16.5),
-    { x: -45, y: 8.25, z: 50 },
-  );
+  const frontLeftWall = createWall(50, 16.5)
+    .translateX(-45)
+    .translateY(8.25)
+    .translateZ(50);
 
-  const frontRightWall = setPosition(
-    createWall(50, 16.5),
-    { x: 45, y: 8.25, z: 50 },
-  );
+  const frontRightWall = createWall(50, 16.5)
+    .translateX(45)
+    .translateY(8.25)
+    .translateZ(50);
 
   const floor = createGrassFloor(140, 100);
 
@@ -54,24 +51,25 @@ function createClassroomScene(): {
   classroom: Object3D,
   surroundings: Object3D,
 } {
-  const classroom = createClassroom();
+  const classroom = createClassroom()
+    .translateY(-10)
+    .translateZ(43);
+
+  const surroundings = createClassroomSurroundings().translateY(-10);
+
+  // Note: Ideal dimension for a blackboard picture is <w: 18, h: 7.5>
   const blackboard = new QuickSlider([
     new QuickSliderNode(createPicture('assets/graphics-pipeline/vertex-shader.png')),
     new QuickSliderNode(createPicture('assets/graphics-pipeline/shape-assembly.png')),
     new QuickSliderNode(createPicture('assets/graphics-pipeline/rasterization.png')),
     new QuickSliderNode(createPicture('assets/graphics-pipeline/fragment-shader.png')),
     new QuickSliderNode(createPicture('assets/graphics-pipeline/testing-and-blending.png')),
-  ]);
+  ])
+    .translateY(7.25)
+    .translateZ(-30.25);
+
   blackboard.name = 'BLACKBOARD_SLIDER';
-
-  // Note: Ideal dimension for a blackboard picture is <w: 18, h: 7.5>
-  setPosition(blackboard, { z: -30.25, y: 7.25 });
-
   classroom.add(blackboard);
-  setPosition(classroom, { z: 43, y: -10 });
-
-  const surroundings = createClassroomSurroundings();
-  setPosition(surroundings, { y: -10 });
 
   return { classroom, surroundings };
 }

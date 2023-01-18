@@ -1,6 +1,5 @@
 import { Object3D, PointLight } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { setPosition } from 'app/common';
 
 export function createClassroom(): Object3D {
   const object = new Object3D();
@@ -11,15 +10,13 @@ export function createClassroom(): Object3D {
       const lightColor = 0xffffff;
       const lightIntensity = 1;
       const lightDistance = 100;
-      const light = setPosition(
-        new PointLight(lightColor, lightIntensity, lightDistance),
-        { y: 12, x: 15 },
-      );
+      const light = new PointLight(lightColor, lightIntensity, lightDistance)
+        .translateX(15)
+        .translateY(12);
 
-      const scene = setPosition(
-        classroom.scene.rotateY(Math.PI / 2),
-        { y: 1.3 },
-      );
+      const scene = classroom.scene
+        .translateY(1.3)
+        .rotateY(Math.PI / 2);
 
       object.add(scene);
       object.add(light);

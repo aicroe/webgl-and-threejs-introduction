@@ -51,16 +51,19 @@ export class Display {
     this.directionalLight.position.set(-1, 1, 2);
     this.scene.add(this.directionalLight);
 
-    const title = createTitle('WebGL and THREE.js \n       Introduction');
-    const titleObserver = new Object3D().translateZ(20);
+    const title = createTitle('WebGL and THREE.js \n       Introduction')
+      .translateZ(-15);
+    const titleObserver = new Object3D()
+      .translateZ(20);
     title.add(titleObserver);
-    title.position.set(0, 0, -15);
 
-    const classroom = new DisplayClassroom();
-    const classroomObserver = new Object3D().translateZ(35).translateY(-3);
+    const classroom = new DisplayClassroom()
+      .translateX(200)
+      .rotateY(-Math.PI  / 2);
+    const classroomObserver = new Object3D()
+      .translateZ(35)
+      .translateY(-3);
     classroom.add(classroomObserver);
-    classroom.rotateY(-Math.PI  / 2);
-    classroom.position.set(200, 0, 0);
 
     const titleFocusPoint = new FocusPoint(title, titleObserver);
     const classroomFocusPoint = classroom.getFocusPoint(classroomObserver);
