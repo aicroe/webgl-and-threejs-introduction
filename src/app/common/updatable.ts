@@ -1,3 +1,8 @@
+export interface UpdateParams {
+  timestamp: number;
+  elapsed: number;
+}
+
 export interface Updatable {
-  update(timestamp: number): void
+  update(params: UpdateParams): void;
 }

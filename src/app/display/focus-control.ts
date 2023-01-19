@@ -4,16 +4,20 @@ import { FocusPoint } from './focus-point';
 
 export class FocusControl implements Updatable {
   private updating = false;
+  private activePoint: FocusPoint | undefined;
 
   constructor(
     private camera: Camera,
-    private activePoint: FocusPoint,
     private readonly updateFactor = 0.025,
     private readonly distanceTolerance = 0.001,
   ) {}
 
+  start(startPoint: FocusPoint): void {
+    this.changeFocusedPoint(startPoint);
+  }
+
   next(): void {
-    const nextPoint = this.activePoint.getNext();
+    const nextPoint = this.activePoint?.getNext();
     if (!nextPoint) {
       return;
     }
@@ -22,7 +26,7 @@ export class FocusControl implements Updatable {
   }
 
   previous(): void {
-    const previousPoint = this.activePoint.getPrevious();
+    const previousPoint = this.activePoint?.getPrevious();
     if (!previousPoint) {
       return;
     }

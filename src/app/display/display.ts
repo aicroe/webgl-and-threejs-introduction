@@ -10,11 +10,11 @@ import {
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Updatable } from 'app/common';
-import { createTitle } from './create-title';
+import { Updatable, UpdateParams } from 'app/common';
 import { DisplayClassroom } from './display-classroom';
 import { FocusControl } from './focus-control';
 import { FocusPoint } from './focus-point';
+import { FloatingTitle } from './floating-title';
 
 export class Display {
   private renderer: WebGLRenderer;
@@ -51,11 +51,14 @@ export class Display {
     this.directionalLight.position.set(-1, 1, 2);
     this.scene.add(this.directionalLight);
 
-    const title = createTitle('WebGL and THREE.js \n       Introduction')
-      .translateZ(-15);
-    const titleObserver = new Object3D()
+    const welcomeTitle = new FloatingTitle(
+      'WebGL and THREE.js \n       Introduction',
+      0x003b41,
+    )
+      .translateZ(-50);
+    const welcomeTitleObserver = new Object3D()
       .translateZ(20);
-    title.add(titleObserver);
+    welcomeTitle.add(welcomeTitleObserver);
 
     const classroom = new DisplayClassroom()
       .translateX(200)
@@ -65,15 +68,24 @@ export class Display {
       .translateY(-3);
     classroom.add(classroomObserver);
 
-    const titleFocusPoint = new FocusPoint(title, titleObserver);
+    const thanksTitle = new FloatingTitle('Thanks!', 0xff9e0a)
+      .translateZ(50)
+      .rotateY(Math.PI);
+    const thanksTitleObserver = new Object3D()
+      .translateZ(20);
+    thanksTitle.add(thanksTitleObserver);
+
+    const welcomeFocusPoint = new FocusPoint(welcomeTitle, welcomeTitleObserver);
     const classroomFocusPoint = classroom.getFocusPoint(classroomObserver);
-    titleFocusPoint.setNext(classroomFocusPoint);
-    this.focusControl = new FocusControl(this.camera, titleFocusPoint);
+    const thanksFocusPoint = new FocusPoint(thanksTitle, thanksTitleObserver);
+    welcomeFocusPoint.setNext(classroomFocusPoint);
+    classroomFocusPoint.setNext(thanksFocusPoint);
 
-    this.scene.add(title);
-    this.scene.add(classroom);
+    this.scene.add(welcomeTitle, classroom, thanksTitle);
+    this.updatableObjects.push(welcomeTitle, classroom, thanksTitle);
 
-    this.updatableObjects.push(classroom);
+    this.focusControl = new FocusControl(this.camera);
+    this.focusControl.start(welcomeFocusPoint);
   }
 
   addHelpers(): void {
@@ -116,12 +128,12 @@ export class Display {
     );
   }
 
-  update(timestamp: number): void {
+  update(params: UpdateParams): void {
     this.focusControl?.update();
-    this.updatableObjects.forEach((each) => each.update(timestamp));
+    this.updatableObjects.forEach((each) => each.update(params));
   }
 
-  render(_timestamp: number): void {
+  render(_params: UpdateParams): void {
     this.renderer.render(this.scene, this.camera);
   }
 
