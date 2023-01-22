@@ -57,15 +57,22 @@ function createClassroomScene(): {
 
   const surroundings = createClassroomSurroundings().translateY(-10);
 
-  // Note: Ideal dimension for a blackboard picture is <w: 18, h: 7.5>
   const blackboard = new QuickSlider([
-    new QuickSliderNode(createPicture('assets/graphics-pipeline/vertex-shader.png')),
-    new QuickSliderNode(createPicture('assets/graphics-pipeline/shape-assembly.png')),
-    new QuickSliderNode(createPicture('assets/graphics-pipeline/rasterization.png')),
-    new QuickSliderNode(createPicture('assets/graphics-pipeline/fragment-shader.png')),
-    new QuickSliderNode(createPicture('assets/graphics-pipeline/testing-and-blending.png')),
+    new QuickSliderNode(createPicture('assets/slides/slide-1.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-2.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-3.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-4.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-5.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-6.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-7.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-8.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-9.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-10.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-11.png', 13.5)),
+    new QuickSliderNode(createPicture('assets/slides/slide-12.png', 13.5)),
   ])
-    .translateY(7.25)
+    .translateX(-0.5)
+    .translateY(8.85)
     .translateZ(-30.25);
 
   blackboard.name = 'BLACKBOARD_SLIDER';
@@ -74,13 +81,12 @@ function createClassroomScene(): {
   return { classroom, surroundings };
 }
 
-class CustomFocusPoint extends FocusPoint {
+class BlackboardFocusPoint extends FocusPoint {
   constructor(
     private blackboard: QuickSlider,
-    target: Object3D,
     observer: Object3D,
   ) {
-    super(target, observer);
+    super(blackboard, observer);
   }
 
   override getNext(): FocusPoint | null {
@@ -114,8 +120,31 @@ export class DisplayClassroom extends Object3D implements Updatable {
     this.add(surroundings);
   }
 
-  getFocusPoint(observer: Object3D): FocusPoint {
-    return new CustomFocusPoint(this.blackboard, this, observer);
+  getFocusPoints(): { start: FocusPoint, end: FocusPoint } {
+    const startObserver = new Object3D()
+      .translateY(-3)
+      .translateZ(35);
+    this.add(startObserver);
+    const startFocusPoint = new FocusPoint(this.blackboard, startObserver);
+
+    const blackboardObserver = new Object3D()
+      .translateZ(7.75);
+    this.blackboard.add(blackboardObserver);
+    const blackboardFocusPoint = new BlackboardFocusPoint(this.blackboard, blackboardObserver);
+
+    const endObserver = new Object3D()
+      .translateY(-3)
+      .translateZ(60);
+    this.add(endObserver);
+    const endFocusPoint = new FocusPoint(this.blackboard, endObserver);
+
+    startFocusPoint.setNext(blackboardFocusPoint);
+    blackboardFocusPoint.setNext(endFocusPoint);
+
+    return {
+      start: startFocusPoint,
+      end: endFocusPoint,
+    };
   }
 
   update(): void {

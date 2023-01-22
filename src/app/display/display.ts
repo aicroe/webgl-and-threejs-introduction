@@ -63,10 +63,6 @@ export class Display {
     const classroom = new DisplayClassroom()
       .translateX(200)
       .rotateY(-Math.PI  / 2);
-    const classroomObserver = new Object3D()
-      .translateZ(35)
-      .translateY(-3);
-    classroom.add(classroomObserver);
 
     const thanksTitle = new FloatingTitle('Thanks!', 0xff9e0a)
       .translateZ(50)
@@ -76,10 +72,13 @@ export class Display {
     thanksTitle.add(thanksTitleObserver);
 
     const welcomeFocusPoint = new FocusPoint(welcomeTitle, welcomeTitleObserver);
-    const classroomFocusPoint = classroom.getFocusPoint(classroomObserver);
+    const {
+      start: classroomStartFocusPoint,
+      end: classroomEndFocusPoint,
+    } = classroom.getFocusPoints();
     const thanksFocusPoint = new FocusPoint(thanksTitle, thanksTitleObserver);
-    welcomeFocusPoint.setNext(classroomFocusPoint);
-    classroomFocusPoint.setNext(thanksFocusPoint);
+    welcomeFocusPoint.setNext(classroomStartFocusPoint);
+    classroomEndFocusPoint.setNext(thanksFocusPoint);
 
     this.scene.add(welcomeTitle, classroom, thanksTitle);
     this.updatableObjects.push(welcomeTitle, classroom, thanksTitle);

@@ -8,15 +8,14 @@ import {
 
 export function createPicture(
   source: string,
-  baseWidth = 10,
-  baseHeight = 10,
+  size = 10,
 ): Object3D {
   const object = new Object3D();
 
   new TextureLoader()
     .loadAsync(source)
     .then((texture) => {
-      const planeGeometry = new PlaneGeometry(baseWidth, baseHeight);
+      const planeGeometry = new PlaneGeometry(size, size);
       const planeMaterial = new MeshLambertMaterial({
         map: texture,
       });
