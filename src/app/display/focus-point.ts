@@ -4,11 +4,9 @@ import {
   getWorldQuaternionFactory,
   lookAt,
 } from 'app/common';
-
 export class FocusPoint {
   private next: FocusPoint | null = null;
   private previous: FocusPoint | null = null;
-  private isObserverQuaternionConfigured = false;
 
   constructor(
     private target: Object3D,
@@ -40,12 +38,7 @@ export class FocusPoint {
   getObserverWorldQuaternion = getWorldQuaternionFactory(this.observer, new Quaternion());
 
   configureObserverQuaternion(): void {
-    if (this.isObserverQuaternionConfigured) {
-      return;
-    }
-
     const targetPosition = this.getTargetWorldPosition();
     lookAt(this.observer, targetPosition);
-    this.isObserverQuaternionConfigured = true;
   }
 }

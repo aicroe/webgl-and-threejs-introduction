@@ -1,5 +1,5 @@
 import { Group, Object3D } from 'three';
-import { Updatable } from 'app/common';
+import { Updatable, UpdateParams } from 'app/common';
 import { createClassroom } from './create-classroom';
 import { createPicture } from './create-picture';
 import { createWall } from './create-wall';
@@ -7,6 +7,8 @@ import { createGrassFloor } from './create-grass-floor';
 import { FocusPoint } from './focus-point';
 import { QuickSlider } from './quick-slider';
 import { QuickSliderNode } from './quick-slider-node';
+import { QuickSliderFocusPoint } from './quick-slider-focus-point';
+import { SimpleProgramSample } from './simple-program-sample';
 
 function createClassroomSurroundings(): Object3D {
   const group = new Group();
@@ -55,99 +57,148 @@ function createClassroomScene(): {
     .translateY(-10)
     .translateZ(43);
 
-  const surroundings = createClassroomSurroundings().translateY(-10);
-
-  const blackboard = new QuickSlider([
-    new QuickSliderNode(createPicture('assets/slides/slide-1.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-2.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-3.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-4.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-5.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-6.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-7.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-8.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-9.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-10.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-11.png', 13.5)),
-    new QuickSliderNode(createPicture('assets/slides/slide-12.png', 13.5)),
-  ])
-    .translateX(-0.5)
-    .translateY(8.85)
-    .translateZ(-30.25);
-
-  blackboard.name = 'BLACKBOARD_SLIDER';
-  classroom.add(blackboard);
+  const surroundings = createClassroomSurroundings()
+    .translateY(-10);
 
   return { classroom, surroundings };
 }
 
-class BlackboardFocusPoint extends FocusPoint {
-  constructor(
-    private blackboard: QuickSlider,
-    observer: Object3D,
-  ) {
-    super(blackboard, observer);
-  }
+function createBlackboardSlide(name: string): Object3D {
+  return createPicture(`assets/slides/${name}.png`, 13.5);
+}
 
-  override getNext(): FocusPoint | null {
-    if (this.blackboard.hasNext()) {
-      this.blackboard.next();
-      return this;
-    }
+function createShadersCodeSlide(): Object3D {
+  const object = new Object3D();
+  const vertexShader = createPicture('assets/code-snippets/vertex-shader.png', 8)
+    .translateX(-4.5);
+  const fragmentShader = createPicture('assets/code-snippets/fragment-shader.png', 8)
+    .translateX(4.5);
 
-    return super.getNext();
-  }
+  object.add(vertexShader, fragmentShader);
 
-  override getPrevious(): FocusPoint | null {
-    if (this.blackboard.hasPrevious()) {
-      this.blackboard.previous();
-      return this;
-    }
-
-    return super.getPrevious();
-  }
+  return object;
 }
 
 export class DisplayClassroom extends Object3D implements Updatable {
-  private blackboard: QuickSlider;
+  private updatableObjects: Updatable[];
 
   constructor() {
     super();
-    const { classroom, surroundings } = createClassroomScene();
+    this.updatableObjects = [];
 
-    this.blackboard = classroom.getObjectByName('BLACKBOARD_SLIDER') as QuickSlider;
-    this.add(classroom);
-    this.add(surroundings);
+    const { classroom, surroundings } = createClassroomScene();
+    this.add(classroom, surroundings);
   }
 
-  getFocusPoints(): { start: FocusPoint, end: FocusPoint } {
-    const startObserver = new Object3D()
+  buildFocusPoints(): { start: FocusPoint, end: FocusPoint } {
+    const firstSeatObserver = new Object3D()
       .translateY(-3)
       .translateZ(35);
-    this.add(startObserver);
-    const startFocusPoint = new FocusPoint(this.blackboard, startObserver);
-
-    const blackboardObserver = new Object3D()
-      .translateZ(7.75);
-    this.blackboard.add(blackboardObserver);
-    const blackboardFocusPoint = new BlackboardFocusPoint(this.blackboard, blackboardObserver);
-
-    const endObserver = new Object3D()
+    const lastSeatObserver = new Object3D()
       .translateY(-3)
       .translateZ(60);
-    this.add(endObserver);
-    const endFocusPoint = new FocusPoint(this.blackboard, endObserver);
 
-    startFocusPoint.setNext(blackboardFocusPoint);
-    blackboardFocusPoint.setNext(endFocusPoint);
+    const blackboardContainer = new Object3D()
+      .translateX(-0.5)
+      .translateY(-1.15)
+      .translateZ(13);
+    const blackboardFeaturedContainer = new Object3D()
+      .translateX(-0.5)
+      .translateY(-2)
+      .translateZ(15);
+    const blackboardCloseObserver = new Object3D()
+      .translateZ(7.75);
+    const blackboardAwayObserver = new Object3D()
+      .translateY(-1)
+      .translateZ(12);
+
+    blackboardContainer.add(
+      blackboardCloseObserver,
+      blackboardAwayObserver,
+    );
+    this.add(
+      firstSeatObserver,
+      lastSeatObserver,
+      blackboardContainer,
+      blackboardFeaturedContainer,
+    );
+
+    const webglIntroBlackboard = new QuickSlider([
+      new QuickSliderNode(createBlackboardSlide('slide-1')),
+      new QuickSliderNode(createBlackboardSlide('slide-2')),
+      new QuickSliderNode(createBlackboardSlide('slide-3')),
+      new QuickSliderNode(createBlackboardSlide('slide-4')),
+    ]);
+    blackboardContainer.add(webglIntroBlackboard);
+
+    const graphicsPipelineSlider = new QuickSlider([
+      new QuickSliderNode(createPicture('assets/infograms/graphics-pipeline.png', 9)),
+    ]);
+    blackboardFeaturedContainer.add(graphicsPipelineSlider);
+
+    const shadersAndThreejsIntroBlackboard = new QuickSlider([
+      new QuickSliderNode(createBlackboardSlide('slide-5')),
+      new QuickSliderNode(createShadersCodeSlide()),
+      new QuickSliderNode(createBlackboardSlide('slide-6')),
+      new QuickSliderNode(createBlackboardSlide('slide-7')),
+    ]);
+    blackboardContainer.add(shadersAndThreejsIntroBlackboard);
+
+    const simpleProgramSample = new SimpleProgramSample();
+    const threejsProgramSlider = new QuickSlider([
+      new QuickSliderNode(createPicture('assets/code-snippets/simple-threejs-program.png', 10)),
+      new QuickSliderNode(simpleProgramSample),
+    ]);
+    blackboardFeaturedContainer.add(threejsProgramSlider);
+
+    const firstSeatFocusPoint = new FocusPoint(
+      blackboardContainer,
+      firstSeatObserver,
+    );
+    const webglIntroFocusPoint = new QuickSliderFocusPoint(
+      webglIntroBlackboard,
+      blackboardCloseObserver,
+    );
+    const graphicsPipelineFocusPoint = new QuickSliderFocusPoint(
+      graphicsPipelineSlider,
+      blackboardAwayObserver,
+    );
+    const shadersAndThreejsIntroFocusPoint = new QuickSliderFocusPoint(
+      shadersAndThreejsIntroBlackboard,
+      blackboardCloseObserver,
+    );
+    const threejsProgramFocusPoint = new QuickSliderFocusPoint(
+      threejsProgramSlider,
+      blackboardAwayObserver,
+    );
+    const lastSeatFocusPoint = new FocusPoint(
+      blackboardContainer,
+      lastSeatObserver,
+    );
+
+    firstSeatFocusPoint.setNext(webglIntroFocusPoint);
+    webglIntroFocusPoint.setNext(graphicsPipelineFocusPoint);
+    graphicsPipelineFocusPoint.setNext(shadersAndThreejsIntroFocusPoint);
+    shadersAndThreejsIntroFocusPoint.setNext(threejsProgramFocusPoint);
+    threejsProgramFocusPoint.setNext(lastSeatFocusPoint);
+
+    this.updatableObjects.push(
+      webglIntroBlackboard,
+      graphicsPipelineSlider,
+      shadersAndThreejsIntroBlackboard,
+      threejsProgramSlider,
+      simpleProgramSample,
+    );
 
     return {
-      start: startFocusPoint,
-      end: endFocusPoint,
+      start: firstSeatFocusPoint,
+      end: lastSeatFocusPoint,
     };
   }
 
-  update(): void {
-    this.blackboard.update();
+  update(params: UpdateParams): void {
+    this.updatableObjects.forEach((updatable) => {
+      updatable.update(params);
+    });
   }
 }

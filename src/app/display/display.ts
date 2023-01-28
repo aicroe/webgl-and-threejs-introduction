@@ -47,7 +47,7 @@ export class Display {
     const ambientLight = new HemisphereLight(0xffffbb, 0x080820, 0.5);
     this.scene.add(ambientLight);
 
-    this.directionalLight = new DirectionalLight(0xffffff, 0.8);
+    this.directionalLight = new DirectionalLight(0xffffff, 0.25);
     this.directionalLight.position.set(-1, 1, 2);
     this.scene.add(this.directionalLight);
 
@@ -75,7 +75,7 @@ export class Display {
     const {
       start: classroomStartFocusPoint,
       end: classroomEndFocusPoint,
-    } = classroom.getFocusPoints();
+    } = classroom.buildFocusPoints();
     const thanksFocusPoint = new FocusPoint(thanksTitle, thanksTitleObserver);
     welcomeFocusPoint.setNext(classroomStartFocusPoint);
     classroomEndFocusPoint.setNext(thanksFocusPoint);

@@ -8,7 +8,7 @@ export function createClassroom(): Object3D {
     .loadAsync('assets/classroom.glb')
     .then((classroom) => {
       const lightColor = 0xffffff;
-      const lightIntensity = 1;
+      const lightIntensity = 0.8;
       const lightDistance = 100;
       const light = new PointLight(lightColor, lightIntensity, lightDistance)
         .translateX(15)
