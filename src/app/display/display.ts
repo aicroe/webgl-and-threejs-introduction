@@ -15,6 +15,7 @@ import { DisplayClassroom } from './display-classroom';
 import { FocusControl } from './focus-control';
 import { FocusPoint } from './focus-point';
 import { FloatingTitle } from './floating-title';
+import { LightHandle } from './light-handle';
 
 export class Display {
   private renderer: WebGLRenderer;
@@ -75,7 +76,7 @@ export class Display {
     const {
       start: classroomStartFocusPoint,
       end: classroomEndFocusPoint,
-    } = classroom.buildFocusPoints();
+    } = classroom.buildFocusPoints([new LightHandle(ambientLight)]);
     const thanksFocusPoint = new FocusPoint(thanksTitle, thanksTitleObserver);
     welcomeFocusPoint.setNext(classroomStartFocusPoint);
     classroomEndFocusPoint.setNext(thanksFocusPoint);

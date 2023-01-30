@@ -1,53 +1,15 @@
-import { Group, Object3D } from 'three';
+import { Object3D } from 'three';
 import { Updatable, UpdateParams } from 'app/common';
 import { createClassroom } from './create-classroom';
+import { createClassroomSurroundings } from './create-classroom-surroundings';
 import { createPicture } from './create-picture';
-import { createWall } from './create-wall';
-import { createGrassFloor } from './create-grass-floor';
 import { FocusPoint } from './focus-point';
+import { LightHandle } from './light-handle';
+import { MeshesAndLightsSample } from './meshes-and-lights-sample';
+import { PagedFocusPoint } from './paged-focus-point';
 import { QuickSlider } from './quick-slider';
 import { QuickSliderNode } from './quick-slider-node';
-import { QuickSliderFocusPoint } from './quick-slider-focus-point';
 import { SimpleProgramSample } from './simple-program-sample';
-
-function createClassroomSurroundings(): Object3D {
-  const group = new Group();
-
-  const rearWall = createWall(140, 16.5)
-    .translateY(8.25)
-    .translateZ(-50);
-
-  const leftWall = createWall(100, 16.5)
-    .translateX(-70)
-    .translateY(8.25)
-    .rotateY(Math.PI / 2);
-
-  const rightWall = createWall(100, 16.5)
-    .translateX(70)
-    .translateY(8.25)
-    .rotateY(Math.PI / 2);
-
-  const frontLeftWall = createWall(50, 16.5)
-    .translateX(-45)
-    .translateY(8.25)
-    .translateZ(50);
-
-  const frontRightWall = createWall(50, 16.5)
-    .translateX(45)
-    .translateY(8.25)
-    .translateZ(50);
-
-  const floor = createGrassFloor(140, 100);
-
-  group.add(floor);
-  group.add(rearWall);
-  group.add(leftWall);
-  group.add(rightWall);
-  group.add(frontLeftWall);
-  group.add(frontRightWall);
-
-  return group;
-}
 
 function createClassroomScene(): {
   classroom: Object3D,
@@ -61,6 +23,13 @@ function createClassroomScene(): {
     .translateY(-10);
 
   return { classroom, surroundings };
+}
+
+function createPagedFocusPoint(
+  pages: QuickSlider | MeshesAndLightsSample,
+  observer: Object3D,
+): FocusPoint {
+  return new PagedFocusPoint(pages, pages, observer);
 }
 
 function createBlackboardSlide(name: string): Object3D {
@@ -88,9 +57,10 @@ export class DisplayClassroom extends Object3D implements Updatable {
 
     const { classroom, surroundings } = createClassroomScene();
     this.add(classroom, surroundings);
+    classroom.name = '$classroom';
   }
 
-  buildFocusPoints(): { start: FocusPoint, end: FocusPoint } {
+  buildFocusPoints(lights: LightHandle[]): { start: FocusPoint, end: FocusPoint } {
     const firstSeatObserver = new Object3D()
       .translateY(-3)
       .translateZ(35);
@@ -106,6 +76,9 @@ export class DisplayClassroom extends Object3D implements Updatable {
       .translateX(-0.5)
       .translateY(-2)
       .translateZ(15);
+    const samplesContainer = new Object3D()
+      .translateY(-6)
+      .translateZ(19.5);
     const blackboardCloseObserver = new Object3D()
       .translateZ(7.75);
     const blackboardAwayObserver = new Object3D()
@@ -121,6 +94,7 @@ export class DisplayClassroom extends Object3D implements Updatable {
       lastSeatObserver,
       blackboardContainer,
       blackboardFeaturedContainer,
+      samplesContainer,
     );
 
     const webglIntroBlackboard = new QuickSlider([
@@ -151,26 +125,47 @@ export class DisplayClassroom extends Object3D implements Updatable {
     ]);
     blackboardFeaturedContainer.add(threejsProgramSlider);
 
+    const meshesAndLightsBlackboard = new QuickSlider([
+      new QuickSliderNode(createBlackboardSlide('slide-8')),
+      new QuickSliderNode(createBlackboardSlide('slide-9')),
+      new QuickSliderNode(createBlackboardSlide('slide-10')),
+    ]);
+    blackboardContainer.add(meshesAndLightsBlackboard);
+
+    const objectsSample = new MeshesAndLightsSample([
+      ...lights,
+      this.getObjectByName('$classroom')?.userData['lightHandle'],
+    ]);
+    samplesContainer.add(objectsSample);
+
     const firstSeatFocusPoint = new FocusPoint(
       blackboardContainer,
       firstSeatObserver,
     );
-    const webglIntroFocusPoint = new QuickSliderFocusPoint(
+    const webglIntroFocusPoint = createPagedFocusPoint(
       webglIntroBlackboard,
       blackboardCloseObserver,
     );
-    const graphicsPipelineFocusPoint = new QuickSliderFocusPoint(
+    const graphicsPipelineFocusPoint = createPagedFocusPoint(
       graphicsPipelineSlider,
       blackboardAwayObserver,
     );
-    const shadersAndThreejsIntroFocusPoint = new QuickSliderFocusPoint(
+    const shadersAndThreejsIntroFocusPoint = createPagedFocusPoint(
       shadersAndThreejsIntroBlackboard,
       blackboardCloseObserver,
     );
-    const threejsProgramFocusPoint = new QuickSliderFocusPoint(
+    const threejsProgramFocusPoint = createPagedFocusPoint(
       threejsProgramSlider,
       blackboardAwayObserver,
     );
+    const meshesAndLightsFocusPoint = createPagedFocusPoint(
+      meshesAndLightsBlackboard,
+      blackboardCloseObserver,
+    );
+    const objectsSampleFocusPoint = createPagedFocusPoint(
+      objectsSample,
+      firstSeatObserver,
+    )
     const lastSeatFocusPoint = new FocusPoint(
       blackboardContainer,
       lastSeatObserver,
@@ -180,7 +175,9 @@ export class DisplayClassroom extends Object3D implements Updatable {
     webglIntroFocusPoint.setNext(graphicsPipelineFocusPoint);
     graphicsPipelineFocusPoint.setNext(shadersAndThreejsIntroFocusPoint);
     shadersAndThreejsIntroFocusPoint.setNext(threejsProgramFocusPoint);
-    threejsProgramFocusPoint.setNext(lastSeatFocusPoint);
+    threejsProgramFocusPoint.setNext(meshesAndLightsFocusPoint);
+    meshesAndLightsFocusPoint.setNext(objectsSampleFocusPoint);
+    objectsSampleFocusPoint.setNext(lastSeatFocusPoint);
 
     this.updatableObjects.push(
       webglIntroBlackboard,
@@ -188,6 +185,8 @@ export class DisplayClassroom extends Object3D implements Updatable {
       shadersAndThreejsIntroBlackboard,
       threejsProgramSlider,
       simpleProgramSample,
+      meshesAndLightsBlackboard,
+      objectsSample,
     );
 
     return {

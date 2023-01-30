@@ -1,18 +1,19 @@
 import { Object3D } from 'three';
 import { FocusPoint } from './focus-point';
-import { QuickSlider } from './quick-slider';
+import { Pages } from './pages';
 
-export class QuickSliderFocusPoint extends FocusPoint {
+export class PagedFocusPoint extends FocusPoint {
   constructor(
-    private slider: QuickSlider,
+    private pages: Pages,
+    target: Object3D,
     observer: Object3D,
   ) {
-    super(slider, observer);
+    super(target, observer);
   }
 
   override getNext(): FocusPoint | null {
-    if (this.slider.hasNext()) {
-      this.slider.next();
+    if (this.pages.hasNext()) {
+      this.pages.next();
       return this;
     }
 
@@ -20,8 +21,8 @@ export class QuickSliderFocusPoint extends FocusPoint {
   }
 
   override getPrevious(): FocusPoint | null {
-    if (this.slider.hasPrevious()) {
-      this.slider.previous();
+    if (this.pages.hasPrevious()) {
+      this.pages.previous();
       return this;
     }
 

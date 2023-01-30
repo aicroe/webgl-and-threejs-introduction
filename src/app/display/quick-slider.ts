@@ -1,4 +1,5 @@
 import { Object3D, Vector3 } from 'three';
+import { Pages } from './pages';
 import { QuickSliderNode } from './quick-slider-node';
 
 class SliderMotion {
@@ -26,7 +27,7 @@ class SliderMotion {
   }
 }
 
-export class QuickSlider extends Object3D {
+export class QuickSlider extends Object3D implements Pages {
   private left: Vector3;
   private right: Vector3;
   private center: Vector3;
