@@ -1,134 +1,139 @@
+import { Object3D } from 'three';
+import { createGeometriesSample } from './create-geometries-sample';
 import {
-  BoxGeometry,
-  CylinderGeometry,
-  ExtrudeGeometry,
-  Mesh,
-  MeshBasicMaterial,
-  MeshLambertMaterial,
-  MeshPhongMaterial,
-  MeshPhysicalMaterial,
-  MeshStandardMaterial,
-  Object3D,
-  Shape,
-  SphereGeometry,
-  TorusGeometry,
-} from 'three';
-import { Updatable, UpdateParams } from 'app/common';
+  createAmbientLightSample,
+  createDirectionalLightSample,
+  createPointLightSample,
+  createSpotLight,
+} from './create-light-samples';
+import { createMaterialsSample } from './create-materials-sample';
 import { Pages } from './pages';
 import { EmptySamplePage, SamplePage } from './sample-page';
 import { LightHandle } from './light-handle';
 
-class SetupPage extends SamplePage {
-  constructor(private container: Object3D, private allLights: LightHandle[]) {
-    super();
-
-    this.container.visible = false;
-
-    {
-      // Sample: Box and Basic material
-      const geometry = new BoxGeometry(3.5, 3.5, 3.5);
-      const material = new MeshBasicMaterial({ color: 0xea794e });
-
-      const mesh = new Mesh(geometry, material)
-        .translateX(-10);
-      this.container.add(mesh);
-    }
-
-    {
-      // Sample: Sphere and Lambert material
-      const geometry = new SphereGeometry(2.5);
-      const material = new MeshLambertMaterial({ color: 0x7795f3 });
-
-      const mesh = new Mesh(geometry, material)
-        .translateX(-5);
-      this.container.add(mesh);
-    }
-
-    {
-      // Sample: Cylinder and Phong material
-      const geometry = new CylinderGeometry(2, 2, 4, 20, 32);
-      const material = new MeshPhongMaterial({ color: 0x1d1d35 });
-
-      const mesh = new Mesh(geometry, material);
-      this.container.add(mesh);
-    }
-
-    {
-      // Sample: Torus and Standard material
-      const geometry = new TorusGeometry(1.5, 0.8, 16, 100);
-      const material = new MeshStandardMaterial({ color: 0x44aa88 });
-
-      const mesh = new Mesh(geometry, material)
-        .translateX(5);
-      this.container.add(mesh);
-    }
-
-    {
-      // Sample: Extrude and Physical material
-      const shape = new Shape();
-      const x = -2.5;
-      const y = -5;
-      shape.moveTo(x + 2.5, y + 2.5);
-      shape.bezierCurveTo(x + 2.5, y + 2.5, x + 2, y, x, y);
-      shape.bezierCurveTo(x - 3, y, x - 3, y + 3.5, x - 3, y + 3.5);
-      shape.bezierCurveTo(x - 3, y + 5.5, x - 1.5, y + 7.7, x + 2.5, y + 9.5);
-      shape.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
-      shape.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
-      shape.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
-
-      const extrudeSettings = {
-        steps: 2,
-        depth: 2,
-        bevelEnabled: true,
-        bevelThickness: 1,
-        bevelSize: 1,
-        bevelOffset: 0,
-        bevelSegments: 1
-      };
-
-      const geometry = new ExtrudeGeometry(shape, extrudeSettings);
-      const material = new MeshPhysicalMaterial({ color: 0xbf9230 });
-
-      const mesh = new Mesh(geometry, material)
-        .translateX(10);
-      mesh.scale.set(0.35, 0.35, 0.35);
-      this.container.add(mesh);
-    }
-  }
-
-  start(): void {
-    this.allLights.forEach((light) => {
-      light.turnOff();
-    });
-    this.container.visible = true;
-  }
-
-  end(): void {
-    this.allLights.forEach((light) => {
-      light.turnOn();
-    });
-    this.container.visible = false;
-  }
-}
-
-export class MeshesAndLightsSample extends Object3D implements Updatable, Pages {
-  private updatableObjects: Updatable[];
+export class MeshesAndLightsSample implements Pages {
+  private object: Object3D;
   private currentPage: SamplePage;
 
-  constructor(allLights: LightHandle[]) {
-    super();
+  constructor(private allLights: LightHandle[]) {
+    this.object = new Object3D();
 
-    this.updatableObjects = [];
-    console.log(allLights)
+    const container = this;
+    const geometriesSample = createGeometriesSample();
+    const materialsSample = createMaterialsSample();
+    const { ambientLight, ambientLightHandle } = createAmbientLightSample();
+    const { directionalLight, directionalLightHandle } = createDirectionalLightSample();
+    const { pointLight, pointLightHandle } = createPointLightSample();
+    const { spotLight, spotLightHandle } = createSpotLight();
+
+    this.object.add(
+      geometriesSample,
+      materialsSample,
+      ambientLight,
+      directionalLight,
+      directionalLight.target,
+      pointLight,
+      spotLight,
+      spotLight.target,
+    );
 
     const initialPage = new EmptySamplePage();
-    const setupPage = new SetupPage(this, allLights);
+    const geometriesSamplePage = new class extends SamplePage {
+      start(): void {
+        geometriesSample.visible = true;
+      }
+      end(): void {
+        geometriesSample.visible = false;
+      }
+    };
+    const turnOffLightsPage = new class extends SamplePage {
+      start(): void {
+        container.turnOffLights();
+      }
+      end(): void {
+        container.turnOnLights();
+      }
+    };
+    const materialsSamplePage = new class extends SamplePage {
+      start(): void {
+        container.turnOffLights();
+        materialsSample.visible = true;
+      }
+      end(): void {
+        container.turnOnLights();
+        materialsSample.visible = false;
+      }
+    }
+    const ambientLightPage = new class extends SamplePage {
+      start(): void {
+        materialsSample.visible = true;
+        container.turnOffLights();
+        ambientLightHandle.turnOn();
+      }
+      end(): void {
+        ambientLightHandle.turnOff();
+        container.turnOnLights();
+        materialsSample.visible = false;
+      }
+    };
+    const directionalLightPage = new class extends SamplePage {
+      start(): void {
+        materialsSample.visible = true;
+        container.turnOffLights();
+        directionalLightHandle.turnOn();
+      }
+      end(): void {
+        directionalLightHandle.turnOff();
+        container.turnOnLights();
+        materialsSample.visible = false;
+      }
+    };
+    const pointLightPage = new class extends SamplePage {
+      start(): void {
+        materialsSample.visible = true;
+        container.turnOffLights();
+        pointLightHandle.turnOn();
+      }
+      end(): void {
+        pointLightHandle.turnOff();
+        container.turnOnLights();
+        materialsSample.visible = false;
+      }
+    };
+    const spotLightPage = new class extends SamplePage {
+      start(): void {
+        materialsSample.visible = true;
+        container.turnOffLights();
+        spotLightHandle.turnOn();
+      }
+      end(): void {
+        spotLightHandle.turnOff();
+        container.turnOnLights();
+        materialsSample.visible = false;
+      }
+    };
     const finalPage = new EmptySamplePage();
 
-    initialPage.setNext(setupPage);
-    setupPage.setNext(finalPage);
+    initialPage.setNext(geometriesSamplePage);
+    geometriesSamplePage.setNext(turnOffLightsPage);
+    turnOffLightsPage.setNext(materialsSamplePage);
+    materialsSamplePage.setNext(ambientLightPage);
+    ambientLightPage.setNext(directionalLightPage);
+    directionalLightPage.setNext(pointLightPage);
+    pointLightPage.setNext(spotLightPage);
+    spotLightPage.setNext(finalPage);
 
     this.currentPage = initialPage;
+    geometriesSample.visible = false;
+    materialsSample.visible = false;
+    ambientLightHandle.turnOff();
+    directionalLightHandle.turnOff();
+    pointLightHandle.turnOff();
+    spotLightHandle.turnOff();
+  }
+
+  getObject(): Object3D {
+    return this.object;
   }
 
   hasNext(): boolean {
@@ -161,9 +166,15 @@ export class MeshesAndLightsSample extends Object3D implements Updatable, Pages 
     this.currentPage = previousPage;
   }
 
-  update(params: UpdateParams): void {
-    this.updatableObjects.forEach((updatable) => {
-      updatable.update(params);
+  private turnOffLights(): void {
+    this.allLights.forEach((light) => {
+      light.turnOff();
+    });
+  }
+
+  private turnOnLights(): void {
+    this.allLights.forEach((light) => {
+      light.turnOn();
     });
   }
 }

@@ -63,7 +63,7 @@ export class Display {
 
     const classroom = new DisplayClassroom()
       .translateX(200)
-      .rotateY(-Math.PI  / 2);
+      .rotateY(-Math.PI / 2);
 
     const thanksTitle = new FloatingTitle('Thanks!', 0xff9e0a)
       .translateZ(50)

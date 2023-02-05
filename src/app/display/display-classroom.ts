@@ -26,7 +26,7 @@ function createClassroomScene(): {
 }
 
 function createPagedFocusPoint(
-  pages: QuickSlider | MeshesAndLightsSample,
+  pages: QuickSlider,
   observer: Object3D,
 ): FocusPoint {
   return new PagedFocusPoint(pages, pages, observer);
@@ -132,11 +132,11 @@ export class DisplayClassroom extends Object3D implements Updatable {
     ]);
     blackboardContainer.add(meshesAndLightsBlackboard);
 
-    const objectsSample = new MeshesAndLightsSample([
+    const meshesAndLightsSample = new MeshesAndLightsSample([
       ...lights,
       this.getObjectByName('$classroom')?.userData['lightHandle'],
     ]);
-    samplesContainer.add(objectsSample);
+    samplesContainer.add(meshesAndLightsSample.getObject());
 
     const firstSeatFocusPoint = new FocusPoint(
       blackboardContainer,
@@ -162,8 +162,9 @@ export class DisplayClassroom extends Object3D implements Updatable {
       meshesAndLightsBlackboard,
       blackboardCloseObserver,
     );
-    const objectsSampleFocusPoint = createPagedFocusPoint(
-      objectsSample,
+    const meshesAndLightsSampleFocusPoint = new PagedFocusPoint(
+      meshesAndLightsSample,
+      meshesAndLightsSample.getObject(),
       firstSeatObserver,
     )
     const lastSeatFocusPoint = new FocusPoint(
@@ -176,8 +177,8 @@ export class DisplayClassroom extends Object3D implements Updatable {
     graphicsPipelineFocusPoint.setNext(shadersAndThreejsIntroFocusPoint);
     shadersAndThreejsIntroFocusPoint.setNext(threejsProgramFocusPoint);
     threejsProgramFocusPoint.setNext(meshesAndLightsFocusPoint);
-    meshesAndLightsFocusPoint.setNext(objectsSampleFocusPoint);
-    objectsSampleFocusPoint.setNext(lastSeatFocusPoint);
+    meshesAndLightsFocusPoint.setNext(meshesAndLightsSampleFocusPoint);
+    meshesAndLightsSampleFocusPoint.setNext(lastSeatFocusPoint);
 
     this.updatableObjects.push(
       webglIntroBlackboard,
@@ -186,7 +187,6 @@ export class DisplayClassroom extends Object3D implements Updatable {
       threejsProgramSlider,
       simpleProgramSample,
       meshesAndLightsBlackboard,
-      objectsSample,
     );
 
     return {
