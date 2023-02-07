@@ -18,7 +18,7 @@ export function createGrassFloor(
 ): Object3D {
   const object = new Object3D();
 
-  new TextureLoader().loadAsync('assets/grass.png').then(
+  new TextureLoader().loadAsync('assets/textures/grass.png').then(
     (texture) => {
       texture.wrapS = RepeatWrapping;
       texture.wrapT = RepeatWrapping;

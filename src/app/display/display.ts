@@ -4,6 +4,7 @@ import {
   DirectionalLightHelper,
   HemisphereLight,
   Object3D,
+  PCFSoftShadowMap,
   PerspectiveCamera,
   Scene,
   sRGBEncoding,
@@ -34,6 +35,8 @@ export class Display {
 
     this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.outputEncoding = sRGBEncoding;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = PCFSoftShadowMap;
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
 
     this.scene = new Scene();

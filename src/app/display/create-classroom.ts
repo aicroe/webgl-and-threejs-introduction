@@ -1,4 +1,4 @@
-import { Object3D, PointLight } from 'three';
+import { Mesh, Object3D, PointLight } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { LightHandle } from './light-handle';
 
@@ -20,6 +20,12 @@ export function createClassroom(): Object3D {
       const scene = classroom.scene
         .translateY(1.3)
         .rotateY(Math.PI / 2);
+
+      scene.traverse((object) => {
+        if (object instanceof Mesh) {
+          object.receiveShadow = true;
+        }
+      });
 
       object.add(scene);
       object.add(light);

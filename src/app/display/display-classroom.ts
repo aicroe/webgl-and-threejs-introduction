@@ -1,5 +1,5 @@
 import { Object3D } from 'three';
-import { Updatable, UpdateParams } from 'app/common';
+import { connectNodes, Updatable, UpdateParams } from 'app/common';
 import { createClassroom } from './create-classroom';
 import { createClassroomSurroundings } from './create-classroom-surroundings';
 import { createPicture } from './create-picture';
@@ -172,13 +172,16 @@ export class DisplayClassroom extends Object3D implements Updatable {
       lastSeatObserver,
     );
 
-    firstSeatFocusPoint.setNext(webglIntroFocusPoint);
-    webglIntroFocusPoint.setNext(graphicsPipelineFocusPoint);
-    graphicsPipelineFocusPoint.setNext(shadersAndThreejsIntroFocusPoint);
-    shadersAndThreejsIntroFocusPoint.setNext(threejsProgramFocusPoint);
-    threejsProgramFocusPoint.setNext(meshesAndLightsFocusPoint);
-    meshesAndLightsFocusPoint.setNext(meshesAndLightsSampleFocusPoint);
-    meshesAndLightsSampleFocusPoint.setNext(lastSeatFocusPoint);
+    connectNodes(
+      firstSeatFocusPoint,
+      webglIntroFocusPoint,
+      graphicsPipelineFocusPoint,
+      shadersAndThreejsIntroFocusPoint,
+      threejsProgramFocusPoint,
+      meshesAndLightsFocusPoint,
+      meshesAndLightsSampleFocusPoint,
+      lastSeatFocusPoint,
+    );
 
     this.updatableObjects.push(
       webglIntroBlackboard,

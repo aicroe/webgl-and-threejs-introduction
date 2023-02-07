@@ -19,7 +19,7 @@ export function createWall(
 ): Object3D {
   const object = new Object3D();
 
-  new TextureLoader().loadAsync('assets/cinder-block-wall.png').then(
+  new TextureLoader().loadAsync('assets/textures/bricks.png').then(
     (texture) => {
       texture.wrapS = RepeatWrapping;
       texture.wrapT = RepeatWrapping;

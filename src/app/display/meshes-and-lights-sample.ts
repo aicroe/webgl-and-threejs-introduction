@@ -1,4 +1,5 @@
 import { Object3D } from 'three';
+import { connectNodes } from 'app/common';
 import { createGeometriesSample } from './create-geometries-sample';
 import {
   createAmbientLightSample,
@@ -7,9 +8,9 @@ import {
   createSpotLight,
 } from './create-light-samples';
 import { createMaterialsSample } from './create-materials-sample';
+import { LightHandle } from './light-handle';
 import { Pages } from './pages';
 import { EmptySamplePage, SamplePage } from './sample-page';
-import { LightHandle } from './light-handle';
 
 export class MeshesAndLightsSample implements Pages {
   private object: Object3D;
@@ -114,14 +115,17 @@ export class MeshesAndLightsSample implements Pages {
     };
     const finalPage = new EmptySamplePage();
 
-    initialPage.setNext(geometriesSamplePage);
-    geometriesSamplePage.setNext(turnOffLightsPage);
-    turnOffLightsPage.setNext(materialsSamplePage);
-    materialsSamplePage.setNext(ambientLightPage);
-    ambientLightPage.setNext(directionalLightPage);
-    directionalLightPage.setNext(pointLightPage);
-    pointLightPage.setNext(spotLightPage);
-    spotLightPage.setNext(finalPage);
+    connectNodes(
+      initialPage,
+      geometriesSamplePage,
+      turnOffLightsPage,
+      materialsSamplePage,
+      ambientLightPage,
+      directionalLightPage,
+      pointLightPage,
+      spotLightPage,
+      finalPage,
+    );
 
     this.currentPage = initialPage;
     geometriesSample.visible = false;

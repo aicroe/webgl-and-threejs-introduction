@@ -27,6 +27,8 @@ export function createDirectionalLightSample(): {
     .translateZ(6);
   const directionalLightHandle = new LightHandle(directionalLight);
 
+  directionalLight.castShadow = true;
+
   return { directionalLight, directionalLightHandle };
 }
 
@@ -43,6 +45,7 @@ export function createPointLightSample(): {
     new MeshBasicMaterial({ color: 0xffff00, wireframe: true }),
   );
   pointLight.add(origin);
+  pointLight.castShadow = true;
 
   return { pointLight, pointLightHandle };
 }
@@ -60,6 +63,7 @@ export function createSpotLight(): {
     new MeshBasicMaterial({ color: 0xffff00, wireframe: true }),
   );
   spotLight.add(origin);
+  spotLight.castShadow = true;
 
   return { spotLight, spotLightHandle };
 }
