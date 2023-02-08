@@ -138,6 +138,13 @@ export class DisplayClassroom extends Object3D implements Updatable {
     ]);
     samplesContainer.add(meshesAndLightsSample.getObject());
 
+    const camerasAndAnimationBlackboard = new QuickSlider([
+      new QuickSliderNode(createBlackboardSlide('slide-11')),
+      new QuickSliderNode(createPicture('assets/infograms/cameras.png', 15)),
+      new QuickSliderNode(createBlackboardSlide('slide-12')),
+    ]);
+    blackboardContainer.add(camerasAndAnimationBlackboard);
+
     const firstSeatFocusPoint = new FocusPoint(
       blackboardContainer,
       firstSeatObserver,
@@ -166,7 +173,11 @@ export class DisplayClassroom extends Object3D implements Updatable {
       meshesAndLightsSample,
       meshesAndLightsSample.getObject(),
       firstSeatObserver,
-    )
+    );
+    const camerasAndAnimationFocusPoint = createPagedFocusPoint(
+      camerasAndAnimationBlackboard,
+      blackboardCloseObserver,
+    );
     const lastSeatFocusPoint = new FocusPoint(
       blackboardContainer,
       lastSeatObserver,
@@ -180,6 +191,7 @@ export class DisplayClassroom extends Object3D implements Updatable {
       threejsProgramFocusPoint,
       meshesAndLightsFocusPoint,
       meshesAndLightsSampleFocusPoint,
+      camerasAndAnimationFocusPoint,
       lastSeatFocusPoint,
     );
 
@@ -190,6 +202,7 @@ export class DisplayClassroom extends Object3D implements Updatable {
       threejsProgramSlider,
       simpleProgramSample,
       meshesAndLightsBlackboard,
+      camerasAndAnimationBlackboard,
     );
 
     return {
