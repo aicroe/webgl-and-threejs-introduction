@@ -7,7 +7,7 @@ export function createClassroom(): Object3D {
   const lightHandle = new LightHandle();
 
   new GLTFLoader()
-    .loadAsync('assets/classroom.glb')
+    .loadAsync('assets/binaries/classroom.glb')
     .then((classroom) => {
       const lightColor = 0xffffff;
       const lightIntensity = 0.8;
@@ -15,6 +15,7 @@ export function createClassroom(): Object3D {
       const light = new PointLight(lightColor, lightIntensity, lightDistance)
         .translateX(15)
         .translateY(12);
+      light.castShadow = true;
       lightHandle.setLight(light);
 
       const scene = classroom.scene

@@ -37,11 +37,10 @@ export class FloatingTitle extends Object3D implements Updatable {
       });
   }
 
-  update({ timestamp }: UpdateParams): void {
-    const speedFactor = 0.001;
+  update({ elapsed }: UpdateParams): void {
     const lengthFactor = 0.1;
+    const rotationValue = Math.sin(elapsed) * lengthFactor;
 
-    const rotationValue = Math.sin(timestamp * speedFactor) * lengthFactor;
     this.titleContainer.rotation.y = rotationValue;
     this.titleContainer.rotation.z = -rotationValue;
   }

@@ -21,7 +21,7 @@ class SliderMotion {
     );
   }
 
-  isComplete(): boolean {
+  private isComplete(): boolean {
     const distance = this.object.position.distanceToSquared(this.target);
     return distance <= this.distanceTolerance;
   }
@@ -36,7 +36,7 @@ export class QuickSlider extends Object3D implements Pages {
 
   constructor(
     private nodes: QuickSliderNode[],
-    private distance = 40,
+    private distance = 80,
     private readonly updateFactor = 0.25,
     private readonly distanceTolerance = 0.001,
   ) {

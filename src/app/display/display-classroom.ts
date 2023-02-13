@@ -1,5 +1,6 @@
 import { Object3D } from 'three';
 import { connectNodes, Updatable, UpdateParams } from 'app/common';
+import { AnimationSample } from './animation-sample';
 import { createClassroom } from './create-classroom';
 import { createClassroomSurroundings } from './create-classroom-surroundings';
 import { createPicture } from './create-picture';
@@ -145,6 +146,15 @@ export class DisplayClassroom extends Object3D implements Updatable {
     ]);
     blackboardContainer.add(camerasAndAnimationBlackboard);
 
+    const animationSample = new AnimationSample();
+    samplesContainer.add(animationSample.getObject());
+
+    const referencesBlackboard = new QuickSlider([
+      new QuickSliderNode(createBlackboardSlide('slide-13')),
+      new QuickSliderNode(createBlackboardSlide('slide-14')),
+    ]);
+    blackboardContainer.add(referencesBlackboard);
+
     const firstSeatFocusPoint = new FocusPoint(
       blackboardContainer,
       firstSeatObserver,
@@ -178,6 +188,15 @@ export class DisplayClassroom extends Object3D implements Updatable {
       camerasAndAnimationBlackboard,
       blackboardCloseObserver,
     );
+    const animationSampleFocusPoint = new PagedFocusPoint(
+      animationSample,
+      animationSample.getObject(),
+      firstSeatObserver,
+    );
+    const referencesFocusPoint = createPagedFocusPoint(
+      referencesBlackboard,
+      blackboardCloseObserver,
+    );
     const lastSeatFocusPoint = new FocusPoint(
       blackboardContainer,
       lastSeatObserver,
@@ -192,6 +211,8 @@ export class DisplayClassroom extends Object3D implements Updatable {
       meshesAndLightsFocusPoint,
       meshesAndLightsSampleFocusPoint,
       camerasAndAnimationFocusPoint,
+      animationSampleFocusPoint,
+      referencesFocusPoint,
       lastSeatFocusPoint,
     );
 
@@ -203,6 +224,8 @@ export class DisplayClassroom extends Object3D implements Updatable {
       simpleProgramSample,
       meshesAndLightsBlackboard,
       camerasAndAnimationBlackboard,
+      animationSample,
+      referencesBlackboard,
     );
 
     return {

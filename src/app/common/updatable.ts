@@ -1,6 +1,6 @@
 export interface UpdateParams {
-  timestamp: number;
   elapsed: number;
+  delta: number;
 }
 
 export interface Updatable {

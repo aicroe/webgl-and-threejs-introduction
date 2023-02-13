@@ -78,13 +78,13 @@ export class DisplayContainerComponent implements OnInit {
 
   private animate(): void {
     animationFrames().pipe(
-      tap((params) => {
-        this.display.update(params);
+      tap(() => {
+        this.display.update();
       }),
       throttleTime(20),
     ).subscribe({
-      next: (params) => {
-        this.display.render(params);
+      next: () => {
+        this.display.render();
       },
       error: (error) => {
         console.error(error);

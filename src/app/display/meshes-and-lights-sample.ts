@@ -1,4 +1,3 @@
-import { Object3D } from 'three';
 import { connectNodes } from 'app/common';
 import { createGeometriesSample } from './create-geometries-sample';
 import {
@@ -9,15 +8,12 @@ import {
 } from './create-light-samples';
 import { createMaterialsSample } from './create-materials-sample';
 import { LightHandle } from './light-handle';
-import { Pages } from './pages';
 import { EmptySamplePage, SamplePage } from './sample-page';
+import { SamplePages } from './sample-pages';
 
-export class MeshesAndLightsSample implements Pages {
-  private object: Object3D;
-  private currentPage: SamplePage;
-
+export class MeshesAndLightsSample extends SamplePages {
   constructor(private allLights: LightHandle[]) {
-    this.object = new Object3D();
+    super();
 
     const container = this;
     const geometriesSample = createGeometriesSample();
@@ -115,7 +111,7 @@ export class MeshesAndLightsSample implements Pages {
     };
     const finalPage = new EmptySamplePage();
 
-    connectNodes(
+    this.currentPage = connectNodes(
       initialPage,
       geometriesSamplePage,
       turnOffLightsPage,
@@ -126,48 +122,12 @@ export class MeshesAndLightsSample implements Pages {
       spotLightPage,
       finalPage,
     );
-
-    this.currentPage = initialPage;
     geometriesSample.visible = false;
     materialsSample.visible = false;
     ambientLightHandle.turnOff();
     directionalLightHandle.turnOff();
     pointLightHandle.turnOff();
     spotLightHandle.turnOff();
-  }
-
-  getObject(): Object3D {
-    return this.object;
-  }
-
-  hasNext(): boolean {
-    return this.currentPage.getNext() !== null;
-  }
-
-  hasPrevious(): boolean {
-    return this.currentPage.getPrevious() !== null;
-  }
-
-  next(): void {
-    const nextPage = this.currentPage.getNext();
-    if (!nextPage) {
-      return;
-    }
-
-    this.currentPage.end();
-    nextPage.start();
-    this.currentPage = nextPage;
-  }
-
-  previous(): void {
-    const previousPage = this.currentPage.getPrevious();
-    if (!previousPage) {
-      return;
-    }
-
-    this.currentPage.end();
-    previousPage.start();
-    this.currentPage = previousPage;
   }
 
   private turnOffLights(): void {

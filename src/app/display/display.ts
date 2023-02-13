@@ -1,5 +1,6 @@
 import {
   CameraHelper,
+  Clock,
   DirectionalLight,
   DirectionalLightHelper,
   HemisphereLight,
@@ -19,6 +20,7 @@ import { FloatingTitle } from './floating-title';
 import { LightHandle } from './light-handle';
 
 export class Display {
+  private clock: Clock;
   private renderer: WebGLRenderer;
   private camera: PerspectiveCamera;
   private scene: Scene;
@@ -28,6 +30,8 @@ export class Display {
   private updatableObjects: Updatable[];
 
   constructor(private container: HTMLElement) {
+    this.clock = new Clock();
+
     const fov = 75;
     const near = 0.1;
     const far = 1000;
@@ -131,12 +135,16 @@ export class Display {
     );
   }
 
-  update(params: UpdateParams): void {
+  update(): void {
+    const params: UpdateParams = {
+      elapsed: this.clock.elapsedTime,
+      delta: this.clock.getDelta(),
+    };
     this.focusControl?.update();
     this.updatableObjects.forEach((each) => each.update(params));
   }
 
-  render(_params: UpdateParams): void {
+  render(): void {
     this.renderer.render(this.scene, this.camera);
   }
 

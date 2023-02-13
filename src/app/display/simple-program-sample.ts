@@ -18,10 +18,8 @@ export class SimpleProgramSample extends Object3D implements Updatable {
     this.add(cube);
   }
 
-  update({ timestamp }: UpdateParams): void {
-    const rotationValue = timestamp * 0.001;
-
-    this.rotation.x = rotationValue;
-    this.rotation.y = rotationValue;
+  update({ elapsed }: UpdateParams): void {
+    this.rotation.x = elapsed;
+    this.rotation.y = elapsed;
   }
 }
