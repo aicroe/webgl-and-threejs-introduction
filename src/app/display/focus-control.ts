@@ -1,4 +1,5 @@
 import { Camera } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Updatable } from 'app/common';
 import { FocusPoint } from './focus-point';
 
@@ -8,6 +9,7 @@ export class FocusControl implements Updatable {
 
   constructor(
     private camera: Camera,
+    private orbitControls: OrbitControls,
     private readonly updateFactor = 0.025,
     private readonly distanceTolerance = 0.001,
   ) {}
@@ -50,6 +52,8 @@ export class FocusControl implements Updatable {
 
     if (this.hasCameraReachedPoint(this.camera, this.activePoint)) {
       this.updating = false;
+      this.orbitControls.target.copy(this.activePoint.getTargetWorldPosition());
+      this.orbitControls.update();
     }
   }
 

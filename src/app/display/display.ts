@@ -23,25 +23,28 @@ export class Display {
   private clock: Clock;
   private renderer: WebGLRenderer;
   private camera: PerspectiveCamera;
+  private orbitControls: OrbitControls;
   private scene: Scene;
-  private directionalLight?: DirectionalLight;
-  private orbitControls?: OrbitControls;
   private focusControl?: FocusControl;
   private updatableObjects: Updatable[];
 
   constructor(private container: HTMLElement) {
     this.clock = new Clock();
 
-    const fov = 75;
-    const near = 0.1;
-    const far = 1000;
-    this.camera = new PerspectiveCamera(fov, this.getAspectRatio(), near, far);
-
     this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.outputEncoding = sRGBEncoding;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFSoftShadowMap;
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+
+    const fov = 75;
+    const near = 0.1;
+    const far = 1000;
+    this.camera = new PerspectiveCamera(fov, this.getAspectRatio(), near, far);
+    this.orbitControls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement,
+    );
 
     this.scene = new Scene();
     this.updatableObjects = [];
@@ -50,14 +53,13 @@ export class Display {
   }
 
   bootstrapScene(): void {
-    this.camera.position.z = 5;
-
-    const ambientLight = new HemisphereLight(0xffffbb, 0x080820, 0.5);
-    this.scene.add(ambientLight);
-
-    this.directionalLight = new DirectionalLight(0xffffff, 0.25);
-    this.directionalLight.position.set(-1, 1, 2);
-    this.scene.add(this.directionalLight);
+    this.camera.translateZ(5);
+    const hemisphereLight = new HemisphereLight(0xffffbb, 0x080820, 0.5);
+    const directionalLight = new DirectionalLight(0xffffff, 0.25)
+      .translateX(-1)
+      .translateY(1)
+      .translateZ(2);
+    this.scene.add(hemisphereLight, directionalLight);
 
     const welcomeTitle = new FloatingTitle(
       'WebGL and THREE.js \n       Introduction',
@@ -83,7 +85,7 @@ export class Display {
     const {
       start: classroomStartFocusPoint,
       end: classroomEndFocusPoint,
-    } = classroom.buildFocusPoints([new LightHandle(ambientLight)]);
+    } = classroom.buildFocusPoints([new LightHandle(hemisphereLight)]);
     const thanksFocusPoint = new FocusPoint(thanksTitle, thanksTitleObserver);
     welcomeFocusPoint.setNext(classroomStartFocusPoint);
     classroomEndFocusPoint.setNext(thanksFocusPoint);
@@ -91,31 +93,8 @@ export class Display {
     this.scene.add(welcomeTitle, classroom, thanksTitle);
     this.updatableObjects.push(welcomeTitle, classroom, thanksTitle);
 
-    this.focusControl = new FocusControl(this.camera);
+    this.focusControl = new FocusControl(this.camera, this.orbitControls);
     this.focusControl.start(welcomeFocusPoint);
-  }
-
-  addHelpers(): void {
-    const cameraHelper = new CameraHelper(this.camera);
-    this.scene.add(cameraHelper);
-
-    if (this.directionalLight) {
-      const directionalLightHelper = new DirectionalLightHelper(
-        this.directionalLight,
-        undefined,
-        0xff0000,
-      );
-      this.scene.add(directionalLightHelper);
-    }
-
-    (globalThis as any).display = this;
-  }
-
-  setUpOrbitControls(): void {
-    this.orbitControls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement,
-    );
   }
 
   next(): void {

@@ -41,9 +41,7 @@ export class DisplayContainerComponent implements OnInit {
   ngOnInit(): void {
     const viewportElement: HTMLElement = this.viewport.nativeElement;
     this.display = new Display(viewportElement);
-    this.display.setUpOrbitControls();
     this.display.bootstrapScene();
-    this.display.addHelpers();
     this.animate();
   }
 
