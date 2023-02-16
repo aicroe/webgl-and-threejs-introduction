@@ -1,8 +1,7 @@
 import {
-  CameraHelper,
   Clock,
+  DefaultLoadingManager,
   DirectionalLight,
-  DirectionalLightHelper,
   HemisphereLight,
   Object3D,
   PCFSoftShadowMap,
@@ -125,6 +124,12 @@ export class Display {
 
   render(): void {
     this.renderer.render(this.scene, this.camera);
+  }
+
+  setLoadHandler(type: 'onLoad', callback: () => void): void;
+  setLoadHandler(type: 'onError', callback: (asset: unknown) => void): void;
+  setLoadHandler(type: 'onLoad' | 'onError', callback: (...args: unknown[]) => void): void {
+    DefaultLoadingManager[type] = callback;
   }
 
   private getAspectRatio(): number {

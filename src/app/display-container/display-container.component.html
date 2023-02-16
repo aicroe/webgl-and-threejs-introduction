@@ -1,4 +1,8 @@
-<div #viewport class="viewport"></div>
+<div
+  #viewport
+  class="viewport"
+  [ngClass]="{ 'viewport--loading': areAssetsLoading }"
+></div>
 
 <mat-toolbar class="toolbar">
 
@@ -7,6 +11,7 @@
       mat-icon-button
       aria-label="Focus Previous"
       title="Previous"
+      [disabled]="areAssetsLoading"
       (click)="previous()"
     >
       <mat-icon>chevron_left</mat-icon>
@@ -16,6 +21,7 @@
       mat-icon-button
       aria-label="Focus Next"
       title="Next"
+      [disabled]="areAssetsLoading"
       (click)="next()"
     >
       <mat-icon>chevron_right</mat-icon>

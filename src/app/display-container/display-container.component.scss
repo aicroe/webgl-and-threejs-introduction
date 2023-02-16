@@ -13,6 +13,10 @@ $toolbar-background-color: rgba(245, 245, 245, 0.25);
   );
 }
 
+.viewport--loading {
+  filter: blur(25px);
+}
+
 .toolbar {
   position: fixed;
   bottom: 0;

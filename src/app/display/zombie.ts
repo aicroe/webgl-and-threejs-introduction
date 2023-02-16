@@ -2,8 +2,10 @@ import {
   AnimationAction,
   AnimationMixer,
   LoopOnce,
+  Matrix4,
   Mesh,
   Object3D,
+  Quaternion,
   Vector3,
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -24,12 +26,11 @@ class ZombieMotion implements Updatable {
       .sub(this.zombie.position)
       .normalize();
 
-    const directionScalar = this.direction.dot(new Vector3(1, 1, 1));
-    this.zombie.rotation.y = (Math.PI / 2) * directionScalar;
+    this.setUpRotation(this.zombie, this.direction);
   }
 
   restore(): void {
-    this.zombie.rotation.y = 0;
+    this.zombie.rotation.set(0, 0, 0);
   }
 
   update(): void {
@@ -45,6 +46,12 @@ class ZombieMotion implements Updatable {
   private isComplete(): boolean {
     const distance = this.zombie.position.distanceToSquared(this.target);
     return distance <= this.distanceTolerance;
+  }
+
+  private setUpRotation(zombie: Zombie, direction: Vector3): void {
+    const rotationMatrix = new Matrix4().lookAt(direction, new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+    const quaternion = new Quaternion().setFromRotationMatrix(rotationMatrix);
+    zombie.quaternion.copy(quaternion);
   }
 }
 
@@ -125,13 +132,13 @@ export class Zombie extends Object3D implements Updatable {
     this.idleAction?.reset().fadeIn(0.5).play();
   }
 
-  stopAllAction():void {
+  stopAllAction(): void {
     this.motionList.forEach((motion) => motion.restore());
     this.motionList = [];
     this.mixer?.stopAllAction();
   }
 
-  update({ delta}: UpdateParams): void {
+  update({ delta }: UpdateParams): void {
     this.mixer?.update(delta);
     this.motionList.forEach((motion) => {
       motion.update();

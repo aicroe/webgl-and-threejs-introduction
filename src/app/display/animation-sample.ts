@@ -12,7 +12,8 @@ export class AnimationSample extends SamplePages implements Updatable {
 
     this.zombie = new Zombie();
     const zombie = this.zombie;
-    const zombieOrigin = new Vector3(-8, -3, 2.5);
+    const zombieOrigin = new Vector3(-8, -3, 0);
+    const zombieEnd = new Vector3(-8, -3, 3.5);
 
     this.object.add(this.zombie);
 
@@ -41,7 +42,7 @@ export class AnimationSample extends SamplePages implements Updatable {
       }
     };
     const walkLeft = new class extends SamplePage {
-      private target = zombieOrigin;
+      private target = zombieEnd;
       start(): void {
         zombie.visible = true;
         zombie.walk(this.target);
@@ -54,7 +55,7 @@ export class AnimationSample extends SamplePages implements Updatable {
     };
     const diePage = new class extends SamplePage {
       start(): void {
-        zombie.position.copy(zombieOrigin);
+        zombie.position.copy(zombieEnd);
         zombie.visible = true;
         zombie.die();
       }

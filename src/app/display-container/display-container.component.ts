@@ -29,6 +29,7 @@ import { Display } from 'app/display';
 export class DisplayContainerComponent implements OnInit {
   @ViewChild('viewport', { static: true }) viewport!: ElementRef;
 
+  areAssetsLoading = true;
   isFullScreen = false;
 
   private display!: Display;
@@ -42,6 +43,8 @@ export class DisplayContainerComponent implements OnInit {
     const viewportElement: HTMLElement = this.viewport.nativeElement;
     this.display = new Display(viewportElement);
     this.display.bootstrapScene();
+    this.display.setLoadHandler('onLoad', this.assetsLoadedHandler);
+    this.display.setLoadHandler('onError', this.assetErrorHandler);
     this.animate();
   }
 
@@ -88,5 +91,14 @@ export class DisplayContainerComponent implements OnInit {
         console.error(error);
       },
     });
+  }
+
+  private assetsLoadedHandler = () => {
+    this.areAssetsLoading = false;
+    this.appRef.tick();
+  }
+
+  private assetErrorHandler = (asset: unknown) => {
+    console.error('Error loading asset:', asset);
   }
 }

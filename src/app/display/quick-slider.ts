@@ -6,12 +6,22 @@ class SliderMotion {
   constructor(
     private object: Object3D,
     private target: Vector3,
+    private hideOnComplete: boolean,
     private updateFactor: number,
     private distanceTolerance: number,
-  ) {}
+  ) {
+    this.object.visible = true;
+  }
+
+  restore(): void {
+    if (this.hideOnComplete) {
+      this.object.visible = false;
+    }
+  }
 
   update(): void {
     if (this.isComplete()) {
+      this.restore();
       return;
     }
 
@@ -78,14 +88,22 @@ export class QuickSlider extends Object3D implements Pages {
       return;
     }
 
-    this.hideAllNodes();
-
+    this.restoreAllMotions();
     const motionList = [] as SliderMotion[];
+
     if (this.activeNode.getObject()) {
-      motionList.push(this.createMotion(this.activeNode.getObject()!, this.right));
+      motionList.push(this.createMotion({
+        object: this.activeNode.getObject()!,
+        target: this.right,
+        hideOnComplete: true,
+      }));
     }
+
     if (nextNode?.getObject()) {
-      motionList.push(this.createMotion(nextNode.getObject()!, this.center));
+      motionList.push(this.createMotion({
+        object: nextNode.getObject()!,
+        target: this.center,
+      }));
     }
     this.motionList = motionList;
     this.activeNode = nextNode;
@@ -97,15 +115,24 @@ export class QuickSlider extends Object3D implements Pages {
       return;
     }
 
-    this.hideAllNodes();
-
+    this.restoreAllMotions();
     const motionList = [] as SliderMotion[];
+
     if (this.activeNode.getObject()) {
-      motionList.push(this.createMotion(this.activeNode.getObject()!, this.left));
+      motionList.push(this.createMotion({
+        object: this.activeNode.getObject()!,
+        target: this.left,
+        hideOnComplete: true,
+      }));
     }
+
     if (previousNode?.getObject()) {
-      motionList.push(this.createMotion(previousNode.getObject()!, this.center));
+      motionList.push(this.createMotion({
+        object: previousNode.getObject()!,
+        target: this.center,
+      }));
     }
+
     this.motionList = motionList;
     this.activeNode = previousNode;
   }
@@ -114,22 +141,21 @@ export class QuickSlider extends Object3D implements Pages {
     this.motionList.forEach((motion) => motion.update());
   }
 
-  private createMotion(object: Object3D, target: Vector3): SliderMotion {
-    object.visible = true;
+  private createMotion({ object, target, hideOnComplete = false }: {
+    object: Object3D;
+    target: Vector3;
+    hideOnComplete?: boolean;
+  }): SliderMotion {
     return new SliderMotion(
       object,
       target,
+      hideOnComplete,
       this.updateFactor,
       this.distanceTolerance,
     );
   }
 
-  private hideAllNodes(): void {
-    this.nodes.forEach((node) => {
-      const object = node.getObject();
-      if (object) {
-        object.visible = false;
-      }
-    });
+  private restoreAllMotions(): void {
+    this.motionList.forEach((motion) => motion.restore());
   }
 }
