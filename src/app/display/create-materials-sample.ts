@@ -17,9 +17,19 @@ export function createMaterialsSample(): Object3D {
 
   const basicMaterial = new MeshBasicMaterial({ color: 0xea794e });
   const lambertMaterial = new MeshLambertMaterial({ color: 0xea794e });
-  const phongMaterial = new MeshPhongMaterial({ color: 0xea794e });
-  const standardMaterial = new MeshStandardMaterial({ color: 0xea794e });
-  const physicalMaterial = new MeshPhysicalMaterial({ color: 0xea794e });
+  const phongMaterial = new MeshPhongMaterial({ color: 0xea794e, shininess: 90 });
+  const standardMaterial = new MeshStandardMaterial({
+    color: 0xea794e,
+    roughness: 0.5,
+    metalness: 0.1,
+  });
+  const physicalMaterial = new MeshPhysicalMaterial({
+    color: 0xea794e,
+    roughness: 0.5,
+    metalness: 0.1,
+    clearcoat: 1,
+    clearcoatRoughness: 0.5,
+  });
 
   const basicMesh = new Mesh(geometry, basicMaterial).translateX(-10);
   const lambertMesh = new Mesh(geometry, lambertMaterial).translateX(-5);

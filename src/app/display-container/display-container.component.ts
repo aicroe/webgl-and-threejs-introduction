@@ -53,11 +53,19 @@ export class DisplayContainerComponent implements OnInit {
     this.display.resize();
   }
 
+  @HostListener('window:keyup.arrowRight')
   next(): void {
+    if (this.areAssetsLoading) {
+      return;
+    }
     this.display.next();
   }
 
+  @HostListener('window:keyup.arrowLeft')
   previous(): void {
+    if (this.areAssetsLoading) {
+      return;
+    }
     this.display.previous();
   }
 
@@ -82,7 +90,7 @@ export class DisplayContainerComponent implements OnInit {
       tap(() => {
         this.display.update();
       }),
-      throttleTime(20),
+      throttleTime(25),
     ).subscribe({
       next: () => {
         this.display.render();

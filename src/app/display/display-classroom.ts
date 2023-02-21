@@ -128,8 +128,6 @@ export class DisplayClassroom extends Object3D implements Updatable {
 
     const meshesAndLightsBlackboard = new QuickSlider([
       new QuickSliderNode(createBlackboardSlide('slide-8')),
-      new QuickSliderNode(createBlackboardSlide('slide-9')),
-      new QuickSliderNode(createBlackboardSlide('slide-10')),
     ]);
     blackboardContainer.add(meshesAndLightsBlackboard);
 
@@ -140,9 +138,9 @@ export class DisplayClassroom extends Object3D implements Updatable {
     samplesContainer.add(meshesAndLightsSample.getObject());
 
     const camerasAndAnimationBlackboard = new QuickSlider([
-      new QuickSliderNode(createBlackboardSlide('slide-11')),
+      new QuickSliderNode(createBlackboardSlide('slide-9')),
       new QuickSliderNode(createPicture('assets/infograms/cameras.png', 15)),
-      new QuickSliderNode(createBlackboardSlide('slide-12')),
+      new QuickSliderNode(createBlackboardSlide('slide-10')),
     ]);
     blackboardContainer.add(camerasAndAnimationBlackboard);
 
@@ -150,8 +148,8 @@ export class DisplayClassroom extends Object3D implements Updatable {
     samplesContainer.add(animationSample.getObject());
 
     const referencesBlackboard = new QuickSlider([
-      new QuickSliderNode(createBlackboardSlide('slide-13')),
-      new QuickSliderNode(createBlackboardSlide('slide-14')),
+      new QuickSliderNode(createBlackboardSlide('slide-11')),
+      new QuickSliderNode(createBlackboardSlide('slide-12')),
     ]);
     blackboardContainer.add(referencesBlackboard);
 
